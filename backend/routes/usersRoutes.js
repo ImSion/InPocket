@@ -1,0 +1,119 @@
+import express from 'express';
+import Users from '../models/Users.js';
+
+const router = express.Router()
+
+// GET recupero tutti gli users presenti nel DB/API
+router.get('/', async (req,res) => {
+    try {
+        const { page=1, limit=10 } = req.query;
+        const user = await Users.find()
+        .limit(limit)
+        .skip((page - 1) * limit)
+
+        const count = await Users.countDocuments();
+
+        res.json({
+            user,
+            currentPage: page,
+            totalPages: Math.ceil(count / limit)
+        })
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+
+// GET recupero lo user tramite l'ID generato da mongoDB, che incollerò nell'url /api/users/<id>
+router.get('/:id', async (req, res) => {
+    try {
+        const user = await Users.findById(req.params.id);
+        if (user == null) {
+            return res.status(404).json({ message: 'Utente non trovato' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// GET rotta per recuperare lo user tramite email
+router.get('/email/:email', async (req, res) => {
+    try {
+        const user = await Users.findOne({ email: req.params.email });
+        if (!user) {
+            return res.status(404).json({ message: 'Utente non trovato' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// POST Creo un nuovo User nel DB/API
+router.post('/', async (req, res) => {
+    const user = new Users(req.body)
+
+    try {
+        const newUsers = await user.save();
+        res.status(201).json(newUsers)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+})
+
+// POST /users: crea un nuovo user
+router.post("/", async (req, res) => {
+    try {
+      // Crea una nuova istanza di User con i dati dalla richiesta
+      const user = new Users(req.body);
+  
+      // La password verrà automaticamente hashata grazie al middleware pre-save
+      // che abbiamo aggiunto nello schema User
+  
+      // Salva il nuovo user nel database
+      const newUser = await user.save();
+  
+      // Rimuovi la password dalla risposta per sicurezza
+      const userResponse = newUser.toObject();
+      delete userResponse.password;
+  
+      // Invia il nuovo user creato come risposta JSON con status 201 (Created)
+      res.status(201).json(userResponse);
+    } catch (err) {
+      // In caso di errore (es. validazione fallita), invia una risposta di errore
+      res.status(400).json({ message: err.message });
+    }
+  });
+
+  // PATCH Route per aggiornare parzialmente un utente esistente
+router.patch('/:id', async (req, res) => {
+    try {
+        const updateUser = await Users.findByIdAndUpdate(
+            req.params.id, 
+            req.body, 
+            { new: true, runValidators: true });
+        if (!updateUser) {
+            return res.status(404).json({ message: 'Utente non trovato' });
+        } else {
+           res.json(updateUser);
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// DELETE Route per eliminare un utente
+router.delete('/:id', async (req, res) => {
+    try {
+        const deletedUser = await Users.findByIdAndDelete(req.params.id);
+        if (!deletedUser) {
+            return res.status(404).json({ message: 'Utente non trovato' });
+        }
+        res.json({ message: 'Utente eliminato' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
+export default router
