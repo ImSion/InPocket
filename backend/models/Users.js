@@ -27,7 +27,7 @@ const usersSchema = new mongoose.Schema(
         type: Date,
         default: Date.now
       },
-      impostazioni: { // Aggiungerei un campo per le impostazioni dell'utente
+      impostazioni: { // campo per le impostazioni dell'utente
         valuta: {
           type: String,
           default: 'EUR'
