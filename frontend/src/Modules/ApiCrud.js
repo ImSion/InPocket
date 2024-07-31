@@ -1,0 +1,73 @@
+import axiosApi from "./Axios";
+
+// CRUD per gli utenti
+
+export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli autori
+export const getUser = (id) => axiosApi.get(`/users/${id}`); // riceviamo un singolo utente
+export const getUserByEmail = (email) => axiosApi.get(`/users/email/${email}`); // riceviamo un utente tramite la mail
+export const createUser = (userData) => axiosApi.post("/users/", userData); // creiamo un utente
+export const updateUser = (id, userData) => axiosApi.patch(`/users/${id}`, userData); // modifichiamo un utente
+export const updateUserAvatar = (id, avatarData) => axiosApi.patch(`/users/${id}/avatar`, avatarData, { // Modifichiamo l'avatar(img) dell'utente
+      headers: {
+          "Content-Type": 'multipart/form-data'
+      }});
+export const deleteUser = (id) => axiosApi.delete(`/users/${id}`); // eliminiamo un utente
+
+// CRUD per le transazioni
+
+export const getTransactions = (page = 1, limit = 10) => axiosApi.get(`/transactions?page=${page}&limit=${limit}`); // GET: Recupera tutte le transazioni (con paginazione)
+export const getTransaction = (id) => axiosApi.get(`/transactions/${id}`); // GET: Recupera una transazione specifica tramite ID
+export const getUserTransactions = (userId) => axiosApi.get(`/transactions/user/${userId}`); // GET: Recupera tutte le transazioni di uno specifico utente
+export const createTransaction = async (transactionData) => { // POST: Crea una nuova transazione
+  try {
+    const response = await axiosApi.post("/transactions", transactionData);
+    return response.data;
+  } catch (error) {
+    console.error("Errore nella chiamata API createTransaction:", error.response?.data);
+    throw error;
+  }
+};
+export const updateTransaction = (id, transactionData) => axiosApi.patch(`/transactions/${id}`, transactionData); // PATCH: Aggiorna parzialmente una transazione esistente
+export const deleteTransaction = (id) => axiosApi.delete(`/transactions/${id}`); // DELETE: Elimina una transazione
+export const getTotalExpenses = (userId, startDate, endDate) => // GET: Ottieni il totale delle spese per un utente in un periodo specifico
+  axiosApi.get(`/transactions/total-expenses/${userId}`, {
+    params: { startDate, endDate }
+  });
+
+  export const getExpensesByCategory = (userId, startDate, endDate, expandCategories) => // GET: Ottieni il totale delle spese per categoria per un utente in un periodo specifico
+  axiosApi.get(`/transactions/expenses-by-category/${userId}`, {
+    params: { startDate, endDate, expandCategories }
+  });
+
+
+  // CRUD per autenticazione 
+
+  // Funzione per registrare un nuovo utente
+export const registerUser = (userData) => axiosApi.post("/users", userData);
+
+// Funzione per effettuare il login di un utente
+export const loginUser = async (credentials) => {
+      try {
+        const response = await axiosApi.post("/auth", credentials);
+        console.log("Risposta API login:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Errore nella chiamata API di login:", error);
+        throw error;
+      }
+    };
+
+// Funzione per ottenere i dati dell'utente attualmente autenticato
+export const getMe = () =>
+      axiosApi.get("/auth/me").then((response) => response.data);
+
+// Funzione per ottenere i dati dell'utente attualmente autenticato con gestione degli errori
+export const getUserData = async () => {
+      try {
+        const response = await axiosApi.get('/auth/me'); // Effettua la richiesta per ottenere i dati dell'utente
+        return response.data; // Restituisce i dati della risposta
+      } catch (error) {
+        console.error('Errore nel recupero dei dati utente:', error); // Log dell'errore per debugging
+        throw error; // Lancia l'errore per essere gestito dal chiamante
+      }
+    };

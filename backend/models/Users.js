@@ -43,14 +43,8 @@ const usersSchema = new mongoose.Schema(
         default: "https://www.shutterstock.com/image-vector/default-avatar-profile-vector-user-260nw-1705357234.jpg"
       },
       password: {
-        type: String,
-        required: function() { return !this.googleid; } // La password è richiesta solo se non c'è un googleid
-      },
-      googleid: { 
         type: String
-
-      }
-
+      },
     },
     {
        collection: 'users',
