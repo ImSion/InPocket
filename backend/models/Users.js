@@ -10,14 +10,14 @@ const usersSchema = new mongoose.Schema(
       },
       cognome: {
         type: String,
-        required: true,
+        required: false,
         trim: true 
       },
       email: {
         type: String,
         required: true,
         trim: true,
-        unique: true 
+        unique: function() { return !this.email.endsWith('@example.com'); }
       },
       data_di_nascita: {
         type: Date,
@@ -45,6 +45,11 @@ const usersSchema = new mongoose.Schema(
       password: {
         type: String
       },
+      
+      identities: [{
+        provider: String,
+        user_id: String
+      }]
     },
     {
        collection: 'users',

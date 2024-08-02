@@ -1,6 +1,6 @@
 import express from 'express';
 import Users from '../models/Users.js';
-import cloudinaryUploader from '../config/cloudinaryConfig.js'
+import { cloudinaryUploader } from '../config/cloudinaryConfig.js'
 
 const router = express.Router()
 
@@ -52,15 +52,51 @@ router.get('/email/:email', async (req, res) => {
 
 // POST Creo un nuovo User nel DB/API
 router.post('/', async (req, res) => {
-    const user = new Users(req.body)
-
     try {
-        const newUsers = await user.save();
-        res.status(201).json(newUsers)
+        const { auth0Id, email, nome, cognome, avatar, provider } = req.body;
+        console.log("Dati ricevuti:", req.body);
+
+        if (!email) {
+            return res.status(400).json({ message: "Email è obbligatoria" });
+        }
+
+        let user = await Users.findOne({ email });
+
+        if (user) {
+            // Aggiorna l'utente esistente
+            user.nome = nome || user.nome;
+            user.cognome = cognome || user.cognome;
+            user.avatar = avatar || user.avatar;
+            
+            // Aggiungi o aggiorna l'identità
+            const identityIndex = user.identities.findIndex(id => id.provider === provider);
+            if (identityIndex > -1) {
+                user.identities[identityIndex].user_id = auth0Id;
+            } else {
+                user.identities.push({ provider, user_id: auth0Id });
+            }
+
+            await user.save();
+            console.log("Utente aggiornato:", user);
+            return res.status(200).json({ message: "Utente aggiornato", user });
+        } else {
+            // Crea un nuovo utente
+            user = new Users({
+                email,
+                nome,
+                cognome,
+                avatar,
+                identities: [{ provider, user_id: auth0Id }]
+            });
+            await user.save();
+            console.log("Nuovo utente creato:", user);
+            return res.status(201).json({ message: "Nuovo utente creato", user });
+        }
     } catch (error) {
+        console.error("Errore durante la registrazione:", error);
         res.status(400).json({message: error.message})
     }
-})
+});
 
 // POST /users: crea un nuovo user
 router.post("/", async (req, res) => {

@@ -43,7 +43,16 @@ export const getTotalExpenses = (userId, startDate, endDate) => // GET: Ottieni 
   // CRUD per autenticazione 
 
   // Funzione per registrare un nuovo utente
-export const registerUser = (userData) => axiosApi.post("/users", userData);
+  export const registerUser = async (userData) => {
+    try {
+      const response = await axiosApi.post("/users", userData);
+      console.log("Risposta API registrazione:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Errore nella chiamata API di registrazione:", error.response?.data || error.message);
+      return null;
+    }
+  };
 
 // Funzione per effettuare il login di un utente
 export const loginUser = async (credentials) => {

@@ -7,14 +7,10 @@ import UserProfile from './Pages/UserProfile'
 import Nav from "./Components/Nav";
 import MyFooter  from "./Components/MyFooter";
 import { useAuth0 } from "@auth0/auth0-react";
+import { registerUser } from "./Modules/ApiCrud";
 
 function App() {
   const { isLoading, isAuthenticated, error, user, loginWithRedirect } = useAuth0();
-
-  console.log("isLoading:", isLoading);
-  console.log("isAuthenticated:", isAuthenticated);
-  console.log("error:", error);
-  console.log("user:", user);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -22,6 +18,27 @@ function App() {
       loginWithRedirect();
     }
   }, [isLoading, isAuthenticated, loginWithRedirect]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log("Utente autenticato, dati ricevuti:", user);
+      registerUser({
+        auth0Id: user.sub,
+        email: user.email || `${user.sub}@example.com`,  // Usa un'email di fallback se non fornita
+        nome: user.given_name || user.name || user.nickname,
+        cognome: user.family_name || '',
+        avatar: user.picture,
+        provider: user.sub.split('|')[0]
+      }).then(result => {
+        if (result) {
+          console.log("Utente registrato/aggiornato con successo:", result);
+        } else {
+          console.log("Errore durante la registrazione/aggiornamento dell'utente");
+        }
+      });
+    }
+  }, [isAuthenticated, user]);
+
 
   if (isLoading) {
     return <div>Loading...</div>;
