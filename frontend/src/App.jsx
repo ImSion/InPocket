@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Login from './Pages/Login';
 import Register from './Pages/Register'
@@ -12,12 +12,13 @@ import { registerUser } from "./Modules/ApiCrud";
 function App() {
   const { isLoading, isAuthenticated, error, user, loginWithRedirect } = useAuth0();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      console.log("Tentativo di login automatico");
-      loginWithRedirect();
-    }
-  }, [isLoading, isAuthenticated, loginWithRedirect]);
+  // Rimuoviamo questo useEffect per evitare il reindirizzamento automatico
+  // useEffect(() => {
+  //   if (!isLoading && !isAuthenticated) {
+  //     console.log("Tentativo di login automatico");
+  //     loginWithRedirect();
+  //   }
+  // }, [isLoading, isAuthenticated, loginWithRedirect]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -48,11 +49,11 @@ function App() {
      <Router>
       <Nav/>
       <Routes>
-        <Route path='/' element={<Navigate to="/login" replace/>}/>
+        <Route path='/' element={<Home />}/>
         <Route path='/login' element={<Login />}/>
         <Route path="/register" element={<Register />}/>
-        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
       <MyFooter/>
      </Router>

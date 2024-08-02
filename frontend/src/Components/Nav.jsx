@@ -10,10 +10,11 @@ import {
   NavbarCollapse,
   NavbarLink,
   NavbarToggle,
+  Button,
 } from "flowbite-react";
 
 export default function Nav() {
-  const { user, isAuthenticated, logout } = useAuth0();
+  const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
 
   return (
     <Navbar fluid>
@@ -22,31 +23,40 @@ export default function Nav() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
       </NavbarBrand>
       <div className="flex md:order-2">
-        <Dropdown
-          arrowIcon={false}
-          inline
-          label={
-            <Avatar 
-              alt="User settings" 
-              img={isAuthenticated ? user.picture : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"} 
-              rounded 
-            />
-          }
-        >
-          <DropdownHeader>
-            <span className="block text-sm">{isAuthenticated ? user.name : "Guest"}</span>
-            <span className="block truncate text-sm font-medium">{isAuthenticated ? user.email : "guest@example.com"}</span>
-          </DropdownHeader>
-          <DropdownItem>Dashboard</DropdownItem>
-          <DropdownItem>Settings</DropdownItem>
-          <DropdownItem>Earnings</DropdownItem>
-          <DropdownDivider />
-          {isAuthenticated ? (
+        {isAuthenticated ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar 
+                alt="User settings" 
+                img={user.picture} 
+                rounded 
+              />
+            }
+          >
+            <DropdownHeader>
+              <span className="block text-sm">{user.name}</span>
+              <span className="block truncate text-sm font-medium">{user.email}</span>
+            </DropdownHeader>
+            <DropdownItem>Dashboard</DropdownItem>
+            <DropdownItem>Settings</DropdownItem>
+            <DropdownItem>Earnings</DropdownItem>
+            <DropdownDivider />
             <DropdownItem onClick={() => logout({ returnTo: window.location.origin })}>Sign out</DropdownItem>
-          ) : (
-            <DropdownItem href="/login">Sign in</DropdownItem>
-          )}
-        </Dropdown>
+          </Dropdown>
+        ) : (
+          <div className="flex items-center">
+            <span className="mr-2">Effettua</span>
+            <Button size="sm" onClick={() => loginWithRedirect()} className="mr-2">
+              Login
+            </Button>
+            <span className="mr-2">o</span>
+            <Button size="sm" onClick={() => loginWithRedirect({ screen_hint: 'signup' })}>
+              Registrati
+            </Button>
+          </div>
+        )}
         <NavbarToggle />
       </div>
       <NavbarCollapse>
