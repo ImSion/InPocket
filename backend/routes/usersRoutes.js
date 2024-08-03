@@ -53,7 +53,7 @@ router.get('/email/:email', async (req, res) => {
 // POST Creo un nuovo User nel DB/API
 router.post('/', async (req, res) => {
     try {
-        const { auth0Id, email, nome, cognome, avatar, provider } = req.body;
+        const { auth0Id, email, nome, cognome, password, avatar, provider } = req.body;
         console.log("Dati ricevuti:", req.body);
 
         if (!email) {
@@ -85,6 +85,7 @@ router.post('/', async (req, res) => {
                 email,
                 nome,
                 cognome,
+                password,
                 avatar,
                 identities: [{ provider, user_id: auth0Id }]
             });
@@ -99,28 +100,18 @@ router.post('/', async (req, res) => {
 });
 
 // POST /users: crea un nuovo user
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
     try {
-      // Crea una nuova istanza di User con i dati dalla richiesta
-      const user = new Users(req.body);
-  
-      // La password verrà automaticamente hashata grazie al middleware pre-save
-      // che abbiamo aggiunto nello schema User
-  
-      // Salva il nuovo user nel database
-      const newUser = await user.save();
-  
-      // Rimuovi la password dalla risposta per sicurezza
-      const userResponse = newUser.toObject();
-      delete userResponse.password;
-  
-      // Invia il nuovo user creato come risposta JSON con status 201 (Created)
-      res.status(201).json(userResponse);
-    } catch (err) {
-      // In caso di errore (es. validazione fallita), invia una risposta di errore
-      res.status(400).json({ message: err.message });
+        console.log("Dati ricevuti:", req.body);
+        const user = new Users(req.body);
+        const newUser = await user.save();
+        console.log("Nuovo utente salvato:", newUser);
+        res.status(201).json(newUser);
+    } catch (error) {
+        console.error("Errore durante il salvataggio dell'utente:", error);
+        res.status(400).json({ message: error.message });
     }
-  });
+});
 
   // PATCH Route per aggiornare parzialmente un utente esistente
 router.patch('/:id', async (req, res) => {
@@ -138,6 +129,23 @@ router.patch('/:id', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+// PATCH: aggiorna un utente tramite email
+router.patch('/email/:email', async (req, res) => {
+    try {
+      const updatedUser = await Users.findOneAndUpdate(
+        { email: req.params.email },
+        req.body,
+        { new: true, runValidators: true }
+      );
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'Utente non trovato' });
+      }
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
 
 // PATCH /authors/:authorId/avatar: carica un'immagine avatar per l'autore specificato
 router.patch("/:userId/avatar", cloudinaryUploader.single("avatar"), async (req, res) => {

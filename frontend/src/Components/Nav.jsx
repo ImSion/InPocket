@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate, Link, } from "react-router-dom";
 import {
   Avatar,
   Dropdown,
@@ -15,6 +16,11 @@ import {
 
 export default function Nav() {
   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
+  const navigate = useNavigate();
+
+  const handleRegister = () => {
+    navigate('/register');
+  };
 
   return (
     <Navbar fluid>
@@ -36,10 +42,13 @@ export default function Nav() {
             }
           >
             <DropdownHeader>
-              <span className="block text-sm">{user.name}</span>
               <span className="block truncate text-sm font-medium">{user.email}</span>
             </DropdownHeader>
-            <DropdownItem>Dashboard</DropdownItem>
+            <DropdownItem>
+              <Link to={'/profile'}>
+                Profilo
+               </Link>
+            </DropdownItem>
             <DropdownItem>Settings</DropdownItem>
             <DropdownItem>Earnings</DropdownItem>
             <DropdownDivider />
@@ -52,7 +61,7 @@ export default function Nav() {
               Login
             </Button>
             <span className="mr-2">o</span>
-            <Button size="sm" onClick={() => loginWithRedirect({ screen_hint: 'signup' })}>
+            <Button size="sm" onClick={handleRegister}>
               Registrati
             </Button>
           </div>
@@ -60,7 +69,7 @@ export default function Nav() {
         <NavbarToggle />
       </div>
       <NavbarCollapse>
-        <NavbarLink href="#" active>
+        <NavbarLink href="/home" active>
           Home
         </NavbarLink>
         <NavbarLink href="#">About</NavbarLink>

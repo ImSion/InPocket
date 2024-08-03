@@ -4,9 +4,28 @@ import axiosApi from "./Axios";
 
 export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli autori
 export const getUser = (id) => axiosApi.get(`/users/${id}`); // riceviamo un singolo utente
-export const getUserByEmail = (email) => axiosApi.get(`/users/email/${email}`); // riceviamo un utente tramite la mail
+export const getUserByEmail = async (email) => { // riceviamo un utente tramite la mail
+  try {
+    const response = await axiosApi.get(`/users/email/${email}`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null; // Utente non trovato
+    }
+    throw error;
+  }
+}; 
 export const createUser = (userData) => axiosApi.post("/users/", userData); // creiamo un utente
-export const updateUser = (id, userData) => axiosApi.patch(`/users/${id}`, userData); // modifichiamo un utente
+export const updateUser = async (email, userData) => {
+  try {
+    const response = await axiosApi.patch(`/users/email/${email}`, userData);
+    console.log("Risposta API aggiornamento:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Errore nell'aggiornamento dell'utente:", error);
+    throw error;
+  }
+};
 export const updateUserAvatar = (id, avatarData) => axiosApi.patch(`/users/${id}/avatar`, avatarData, { // Modifichiamo l'avatar(img) dell'utente
       headers: {
           "Content-Type": 'multipart/form-data'
@@ -47,10 +66,10 @@ export const getTotalExpenses = (userId, startDate, endDate) => // GET: Ottieni 
     try {
       const response = await axiosApi.post("/users", userData);
       console.log("Risposta API registrazione:", response.data);
-      return response.data;
+      return response.data.user || response.data;  // Gestisce entrambi i casi
     } catch (error) {
       console.error("Errore nella chiamata API di registrazione:", error.response?.data || error.message);
-      return null;
+      throw error;
     }
   };
 

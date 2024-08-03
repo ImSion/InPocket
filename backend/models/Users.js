@@ -5,12 +5,10 @@ const usersSchema = new mongoose.Schema(
     {
       nome: {
         type: String,
-        required: true,
         trim: true //rimuove gli spazi all'inizio e alla fine della stringa
       },
       cognome: {
         type: String,
-        required: false,
         trim: true 
       },
       email: {
@@ -43,7 +41,11 @@ const usersSchema = new mongoose.Schema(
         default: "https://www.shutterstock.com/image-vector/default-avatar-profile-vector-user-260nw-1705357234.jpg"
       },
       password: {
-        type: String
+        type: String,
+      },
+      isProfileComplete: {
+        type: Boolean,
+        default: false
       },
       
       identities: [{
@@ -66,7 +68,7 @@ usersSchema.pre('save', async function(next) {
 
   // Eseguo l'hashing solo se la password è stata modificata
   // oppure è una nuova password
-  if(!this.isModified('password')) return next()
+  if(!this.isModified('password') || !this.password) return next()
 
     try {
       // Genero un valore casuale con 10 round di hashing
@@ -76,7 +78,7 @@ usersSchema.pre('save', async function(next) {
       next();
     } catch(error) {
       // Se si verifica un errore, passo l'errore
-      next(err)
+      next(error)
     }
 })
 

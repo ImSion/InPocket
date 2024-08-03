@@ -1,18 +1,17 @@
 import React from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
+import { useOutletContext } from 'react-router-dom';
 
 export default function Home() {
-  const { isAuthenticated, user } = useAuth0();
+  const { userData } = useOutletContext();
 
   return (
     <div className='min-h-screen'>
       <h1>Welcome to InPocket</h1>
-      {isAuthenticated ? (
-        <p>Hello, {user.name}! You're logged in.</p>
+      {userData ? (
+        <p>Hello, {userData.nome}! You're logged in.</p>
       ) : (
         <p>Please login or register to access all features.</p>
       )}
-      {/* Aggiungi qui il contenuto principale della tua home page */}
     </div>
   );
 }
