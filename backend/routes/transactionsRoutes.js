@@ -4,6 +4,19 @@ import Users from '../models/Users.js';
 
 const router = express.Router();
 
+// GET: recupero tutte le transazioni di uno specifico utente
+router.get('/user/:userId', async (req, res) => {
+  try {
+    console.log("Fetching transactions for user:", req.params.userId);
+    const transactions = await Transaction.find({ user: req.params.userId });
+    console.log("Transactions found:", transactions.length);
+    res.json(transactions);
+  } catch (error) {
+    console.error("Error fetching user transactions:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // GET: recupero tutte le transazioni
 router.get('/', async (req, res) => {
     try {
@@ -38,19 +51,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// GET: recupero tutte le transazioni di uno specifico utente
-router.get('/user/:userId', async (req, res) => {
-    try {
-      const transactions = await Transaction.find({ user: req.params.userId });
-      if (transactions.length === 0) {
-        return res.status(404).json({ message: "Nessuna transazione trovata per questo utente" });
-      }
-      res.json(transactions);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: error.message });
-    }
-  });
 
 // POST: crea una nuova transazione
 router.post('/', async (req, res) => {

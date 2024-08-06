@@ -4,6 +4,18 @@ import axiosApi from "./Axios";
 
 export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli autori
 export const getUser = (id) => axiosApi.get(`/users/${id}`); // riceviamo un singolo utente
+export const getUserByAuth0Id = async (auth0Id) => {
+  try {
+    const response = await axiosApi.get(`/users/auth0/${auth0Id}`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      console.log("Utente non trovato per Auth0Id:", auth0Id);
+      return null;
+    }
+    throw error;
+  }
+};
 export const getUserByEmail = async (email) => { // riceviamo un utente tramite la mail
   try {
     const response = await axiosApi.get(`/users/email/${email}`);
@@ -15,11 +27,20 @@ export const getUserByEmail = async (email) => { // riceviamo un utente tramite 
     throw error;
   }
 }; 
-export const createUser = (userData) => axiosApi.post("/users/", userData); // creiamo un utente
-export const updateUser = async (email, userData) => {
+export const createUser = async (userData) => { // creiamo un utente
   try {
-    const response = await axiosApi.patch(`/users/email/${email}`, userData);
-    console.log("Risposta API aggiornamento:", response.data);
+    const response = await axiosApi.post("/users", userData);
+    console.log("Nuovo utente creato:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Errore nella creazione dell'utente:", error);
+    throw error;
+  }
+}; 
+export const updateUser = async (id, userData) => {
+  try {
+    const response = await axiosApi.patch(`/users/${id}`, userData);
+    console.log("Utente aggiornato:", response.data);
     return response.data;
   } catch (error) {
     console.error("Errore nell'aggiornamento dell'utente:", error);
@@ -37,17 +58,25 @@ export const deleteUser = (id) => axiosApi.delete(`/users/${id}`); // eliminiamo
 export const getTransactions = (page = 1, limit = 10) => axiosApi.get(`/transactions?page=${page}&limit=${limit}`); // GET: Recupera tutte le transazioni (con paginazione)
 export const getTransaction = (id) => axiosApi.get(`/transactions/${id}`); // GET: Recupera una transazione specifica tramite ID
 export const getUserTransactions = (userId) => axiosApi.get(`/transactions/user/${userId}`); // GET: Recupera tutte le transazioni di uno specifico utente
-export const createTransaction = async (transactionData) => { // POST: Crea una nuova transazione
+export const createTransaction = async (userId, transactionData) => {
   try {
-    const response = await axiosApi.post("/transactions", transactionData);
+    console.log("Dati transazione da inviare:", { ...transactionData, user: userId });
+    const response = await axiosApi.post("/transactions", { // Cambiato da "/transaction" a "/transactions"
+      ...transactionData,
+      user: userId,
+      categoria: transactionData.categoria || '',
+      tipo: transactionData.tipo || 'uscita'
+    });
+    console.log("Risposta del server:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Errore nella chiamata API createTransaction:", error.response?.data);
+    console.error("Errore completo:", error);
+    console.error("Dettagli errore:", error.response?.data);
     throw error;
   }
 };
-export const updateTransaction = (id, transactionData) => axiosApi.patch(`/transactions/${id}`, transactionData); // PATCH: Aggiorna parzialmente una transazione esistente
-export const deleteTransaction = (id) => axiosApi.delete(`/transactions/${id}`); // DELETE: Elimina una transazione
+export const updateTransaction = (userId, id, transactionData) => axiosApi.patch(`/transactions/${id}`, { ...transactionData, user: userId }); // PATCH: Aggiorna parzialmente una transazione esistente
+export const deleteTransaction = (userId, id) => axiosApi.delete(`/transactions/${id}`, { data: { user: userId } }); // DELETE: Elimina una transazione
 export const getTotalExpenses = (userId, startDate, endDate) => // GET: Ottieni il totale delle spese per un utente in un periodo specifico
   axiosApi.get(`/transactions/total-expenses/${userId}`, {
     params: { startDate, endDate }

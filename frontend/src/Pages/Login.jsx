@@ -5,7 +5,7 @@ import React from 'react'
 export default function Login() {
   return (
     <>
-      <div className="flex flex-col min-h-screen items-center mt-10">
+      <div className="flex flex-col min-h-screen items-center pt-20">
         <h1 className="text-xl font-bold">Auth0 Login</h1>
         <div>
             <LoginButton />

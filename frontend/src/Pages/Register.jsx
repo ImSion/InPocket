@@ -1,15 +1,32 @@
-import React, { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { updateUser } from "../Modules/ApiCrud";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { updateUser, registerUser } from "../Modules/ApiCrud";
 
-export default function Register() {
-  const { userData, setUserData } = useOutletContext();
+export default function Register({ userData, updateUserData }) {
   const [formData, setFormData] = useState({
-    nome: userData?.nome || "",
-    cognome: userData?.cognome || "",
-    data_di_nascita: userData?.data_di_nascita || "",
+    nome: "",
+    cognome: "",
+    email: "",
+    data_di_nascita: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth0();
+
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        nome: userData.nome || user.given_name || "",
+        cognome: userData.cognome || user.family_name || "",
+        email: userData.email || user.email || "",
+        data_di_nascita: userData.data_di_nascita 
+          ? new Date(userData.data_di_nascita).toISOString().split('T')[0] 
+          : "",
+      });
+    }
+    setIsLoading(false);
+  }, [userData, user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,19 +34,36 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const updatedUser = await updateUser(userData.email, {
-        ...formData,
-        isProfileComplete: true,
-      });
-      setUserData(updatedUser);
-      navigate("/home", { replace: true });
+      let updatedUser;
+      if (userData && userData._id) {
+        updatedUser = await updateUser(userData._id, {
+          ...formData,
+          isProfileComplete: true,
+        });
+      } else {
+        updatedUser = await registerUser({
+          ...formData,
+          auth0Id: user.sub,
+          avatar: user.picture,
+          provider: user.sub.split('|')[0],
+          isProfileComplete: true
+        });
+      }
+      updateUserData(updatedUser);
+      navigate("/home");
     } catch (error) {
       console.error("Errore durante il completamento del profilo:", error);
       alert("Errore durante il completamento del profilo. Riprova.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    return <div>Caricamento...</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -63,6 +97,18 @@ export default function Register() {
           />
         </div>
 
+        <div className="mb-4">
+          <input 
+            name="email" 
+            type="email" 
+            placeholder="Email" 
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
         <div className="mb-6">
           <input 
             name="data_di_nascita" 
@@ -77,8 +123,9 @@ export default function Register() {
         <button 
           type="submit"
           className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={isLoading}
         >
-          Completa profilo
+          {isLoading ? "Caricamento..." : "Completa profilo"}
         </button>
       </form>
     </div>

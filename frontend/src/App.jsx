@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Nav from "./Components/Nav";
 import MyFooter from "./Components/MyFooter";
 import AuthWrapper from "./Components/AuthWrapper";
@@ -20,6 +20,7 @@ function App() {
           <Route path="profile" element={<UserProfile />} />
           <Route path="register" element={<Register />} />
         </Route>
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
       <MyFooter />
     </Router>

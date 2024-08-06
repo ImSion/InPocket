@@ -50,7 +50,7 @@ mongoose
 .catch((err) => console.error('Errore', err))
 
 app.use('/api/users', usersRoutes)
-app.use('/api/transaction', transactionRoutes)
+app.use('/api/transactions', transactionRoutes)
 
 const PORT = process.env.PORT || 5002
 

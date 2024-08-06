@@ -50,11 +50,24 @@ router.get('/email/:email', async (req, res) => {
     }
 });
 
+router.get('/auth0/:auth0Id', async (req, res) => {
+    try {
+        const user = await Users.findOne({ 'identities.user_id': req.params.auth0Id });
+        if (!user) {
+            return res.status(404).json({ message: "Utente non trovato" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+  
+
 // POST Creo un nuovo User nel DB/API
 router.post('/', async (req, res) => {
     try {
         const { auth0Id, email, nome, cognome, password, avatar, provider } = req.body;
-        console.log("Dati ricevuti:", req.body);
+        console.log("Dati ricevuti per la creazione dell'utente:", req.body);
 
         if (!email) {
             return res.status(400).json({ message: "Email è obbligatoria" });
@@ -87,7 +100,8 @@ router.post('/', async (req, res) => {
                 cognome,
                 password,
                 avatar,
-                identities: [{ provider, user_id: auth0Id }]
+                identities: [{ provider, user_id: auth0Id }],
+                isProfileComplete: false
             });
             await user.save();
             console.log("Nuovo utente creato:", user);
@@ -114,18 +128,21 @@ router.post('/', async (req, res) => {
 });
 
   // PATCH Route per aggiornare parzialmente un utente esistente
-router.patch('/:id', async (req, res) => {
+  router.patch('/:id', async (req, res) => {
     try {
-        const updateUser = await Users.findByIdAndUpdate(
+        console.log("Dati ricevuti per l'aggiornamento dell'utente:", req.body);
+        const updatedUser = await Users.findByIdAndUpdate(
             req.params.id, 
             req.body, 
-            { new: true, runValidators: true });
-        if (!updateUser) {
+            { new: true, runValidators: true }
+        );
+        if (!updatedUser) {
             return res.status(404).json({ message: 'Utente non trovato' });
-        } else {
-           res.json(updateUser);
         }
+        console.log("Utente aggiornato:", updatedUser);
+        res.json(updatedUser);
     } catch (error) {
+        console.error("Errore durante l'aggiornamento dell'utente:", error);
         res.status(400).json({ message: error.message });
     }
 });

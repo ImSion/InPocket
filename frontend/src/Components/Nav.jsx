@@ -23,7 +23,7 @@ export default function Nav() {
   };
 
   return (
-    <Navbar fluid>
+    <Navbar className="fixed w-full" fluid>
       <NavbarBrand href="">
         <img src="https://picsum.photos/seed/picsum/200/300" className="mr-3 h-6 sm:h-9" alt="" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
@@ -41,7 +41,7 @@ export default function Nav() {
               />
             }
           >
-            <DropdownHeader>
+            <DropdownHeader className="z-10">
               <span className="block truncate text-sm font-medium">{user.email}</span>
             </DropdownHeader>
             <DropdownItem>
