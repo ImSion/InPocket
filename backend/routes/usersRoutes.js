@@ -66,52 +66,55 @@ router.get('/auth0/:auth0Id', async (req, res) => {
 // POST Creo un nuovo User nel DB/API
 router.post('/', async (req, res) => {
     try {
-        const { auth0Id, email, nome, cognome, password, avatar, provider } = req.body;
-        console.log("Dati ricevuti per la creazione dell'utente:", req.body);
-
-        if (!email) {
-            return res.status(400).json({ message: "Email è obbligatoria" });
-        }
-
-        let user = await Users.findOne({ email });
-
-        if (user) {
-            // Aggiorna l'utente esistente
-            user.nome = nome || user.nome;
-            user.cognome = cognome || user.cognome;
-            user.avatar = avatar || user.avatar;
-            
-            // Aggiungi o aggiorna l'identità
-            const identityIndex = user.identities.findIndex(id => id.provider === provider);
-            if (identityIndex > -1) {
-                user.identities[identityIndex].user_id = auth0Id;
-            } else {
-                user.identities.push({ provider, user_id: auth0Id });
-            }
-
-            await user.save();
-            console.log("Utente aggiornato:", user);
-            return res.status(200).json({ message: "Utente aggiornato", user });
+      const { auth0Id, email, nome, cognome, data_di_nascita, avatar, provider } = req.body;
+      console.log("Dati ricevuti per la creazione dell'utente:", req.body);
+  
+      if (!email || !nome || !cognome || !data_di_nascita) {
+        return res.status(400).json({ message: "Tutti i campi sono obbligatori" });
+      }
+  
+      let user = await Users.findOne({ 'identities.user_id': auth0Id });
+  
+      if (user) {
+        // Aggiorna l'utente esistente
+        user.nome = nome;
+        user.cognome = cognome;
+        user.email = email;
+        user.data_di_nascita = data_di_nascita;
+        user.avatar = avatar || user.avatar;
+        user.isProfileComplete = true;
+        
+        // Aggiungi o aggiorna l'identità
+        const identityIndex = user.identities.findIndex(id => id.provider === provider);
+        if (identityIndex > -1) {
+          user.identities[identityIndex].user_id = auth0Id;
         } else {
-            // Crea un nuovo utente
-            user = new Users({
-                email,
-                nome,
-                cognome,
-                password,
-                avatar,
-                identities: [{ provider, user_id: auth0Id }],
-                isProfileComplete: false
-            });
-            await user.save();
-            console.log("Nuovo utente creato:", user);
-            return res.status(201).json({ message: "Nuovo utente creato", user });
+          user.identities.push({ provider, user_id: auth0Id });
         }
+  
+        await user.save();
+        console.log("Utente aggiornato:", user);
+        return res.status(200).json({ message: "Utente aggiornato", user });
+      } else {
+        // Crea un nuovo utente
+        user = new Users({
+          email,
+          nome,
+          cognome,
+          data_di_nascita,
+          avatar,
+          identities: [{ provider, user_id: auth0Id }],
+          isProfileComplete: true
+        });
+        await user.save();
+        console.log("Nuovo utente creato:", user);
+        return res.status(201).json({ message: "Nuovo utente creato", user });
+      }
     } catch (error) {
-        console.error("Errore durante la registrazione:", error);
-        res.status(400).json({message: error.message})
+      console.error("Errore durante la registrazione:", error);
+      res.status(400).json({message: error.message})
     }
-});
+  });
 
 // POST /users: crea un nuovo user
 router.post('/', async (req, res) => {

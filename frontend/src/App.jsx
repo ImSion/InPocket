@@ -27,7 +27,7 @@ function App() {
           <Route path="/" element={<Home userData={userData} />} />
           <Route path="home" element={<Home userData={userData} />} />
           <Route path="profile" element={<UserProfile userData={userData} updateUserData={updateUserData} />} />
-          <Route path="register" element={<Register updateUserData={updateUserData} />} />
+          <Route path="register" element={<Register userData={userData} updateUserData={updateUserData} />} />
         </Route>
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>

@@ -1,32 +1,51 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
-import { updateUser, registerUser } from "../Modules/ApiCrud";
+import { updateUser, registerUser, getUserByAuth0Id } from "../Modules/ApiCrud";
 
-export default function Register({ userData, updateUserData }) {
+export default function Register({ updateUserData }) {
   const [formData, setFormData] = useState({
-    nome: "",
-    cognome: "",
-    email: "",
-    data_di_nascita: "",
+    nome: '',
+    cognome: '',
+    email: '',
+    data_di_nascita: '',
   });
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth0();
 
   useEffect(() => {
-    if (userData) {
-      setFormData({
-        nome: userData.nome || user.given_name || "",
-        cognome: userData.cognome || user.family_name || "",
-        email: userData.email || user.email || "",
-        data_di_nascita: userData.data_di_nascita 
-          ? new Date(userData.data_di_nascita).toISOString().split('T')[0] 
-          : "",
-      });
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      try {
+        let dbUser = await getUserByAuth0Id(user.sub);
+        
+        setFormData({
+          nome: dbUser?.nome || user.given_name || '',
+          cognome: dbUser?.cognome || user.family_name || '',
+          email: dbUser?.email || user.email || '',
+          data_di_nascita: dbUser?.data_di_nascita 
+            ? new Date(dbUser.data_di_nascita).toISOString().split('T')[0] 
+            : '',
+        });
+      } catch (error) {
+        console.error("Errore nel recupero dei dati utente:", error);
+        // Se l'utente non viene trovato, usiamo i dati di Auth0
+        setFormData({
+          nome: user.given_name || '',
+          cognome: user.family_name || '',
+          email: user.email || '',
+          data_di_nascita: '',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
     }
-    setIsLoading(false);
-  }, [userData, user]);
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,26 +55,36 @@ export default function Register({ userData, updateUserData }) {
     e.preventDefault();
     setIsLoading(true);
     try {
+      const dataToSubmit = {
+        ...formData,
+        data_di_nascita: formData.data_di_nascita ? new Date(formData.data_di_nascita).toISOString() : null
+      };
       let updatedUser;
-      if (userData && userData._id) {
-        updatedUser = await updateUser(userData._id, {
-          ...formData,
-          isProfileComplete: true,
-        });
-      } else {
-        updatedUser = await registerUser({
-          ...formData,
-          auth0Id: user.sub,
-          avatar: user.picture,
-          provider: user.sub.split('|')[0],
-          isProfileComplete: true
-        });
-      }
+      // Sempre tenta di registrare un nuovo utente
+      updatedUser = await registerUser({
+        ...dataToSubmit,
+        auth0Id: user.sub,
+        avatar: user.picture,
+        provider: user.sub.split('|')[0],
+        isProfileComplete: true
+      });
       updateUserData(updatedUser);
-      navigate("/home");
+      navigate("/home", { replace: true });
     } catch (error) {
       console.error("Errore durante il completamento del profilo:", error);
-      alert("Errore durante il completamento del profilo. Riprova.");
+      // Se l'utente esiste già, prova ad aggiornarlo
+      if (error.response && error.response.status === 400) {
+        try {
+          updatedUser = await updateUser(user.sub, {
+            ...dataToSubmit,
+            isProfileComplete: true,
+          });
+          updateUserData(updatedUser);
+          navigate("/home", { replace: true });
+        } catch (updateError) {
+          console.error("Errore durante l'aggiornamento del profilo:", updateError);
+        }
+      }
     } finally {
       setIsLoading(false);
     }

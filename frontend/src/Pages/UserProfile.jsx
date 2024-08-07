@@ -41,21 +41,21 @@ export default function UserProfile({ userData, updateUserData }) {
   };
 
   
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const dataToSubmit = {
-      ...formData,
-      data_di_nascita: formatDateForSubmission(formData.data_di_nascita)
-    };
-    const updatedUser = await updateUser(userData.email, dataToSubmit);
-    console.log("Profilo aggiornato:", updatedUser);
-    setUserData(updatedUser);
-    setEditMode(false);
-  } catch (error) {
-    console.error("Errore nell'aggiornamento del profilo:", error);
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const dataToSubmit = {
+        ...formData,
+        data_di_nascita: formatDateForSubmission(formData.data_di_nascita)
+      };
+      const updatedUser = await updateUser(userData._id, dataToSubmit);
+      console.log("Profilo aggiornato:", updatedUser);
+      updateUserData(updatedUser);
+      setEditMode(false);
+    } catch (error) {
+      console.error("Errore nell'aggiornamento del profilo:", error);
+    }
+  };
 
   return (
       <div className='min-h-screen pt-20'>
