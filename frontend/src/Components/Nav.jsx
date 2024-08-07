@@ -14,13 +14,19 @@ import {
   Button,
 } from "flowbite-react";
 
-export default function Nav() {
+export default function Nav({ userData }) {
   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
 
   const handleRegister = () => {
     navigate('/register');
   };
+
+  const handleLogout = () => {
+    logout({ returnTo: window.location.origin });
+  };
+
+  
 
   return (
     <Navbar className="fixed w-full" fluid>
@@ -42,7 +48,9 @@ export default function Nav() {
             }
           >
             <DropdownHeader className="z-10">
-              <span className="block truncate text-sm font-medium">{user.email}</span>
+            <span className="block truncate text-sm font-medium">
+              {userData?.email || user.email || 'Email non disponibile'}
+            </span>
             </DropdownHeader>
             <DropdownItem>
               <Link to={'/profile'}>

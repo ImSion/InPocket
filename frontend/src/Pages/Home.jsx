@@ -2,25 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Card } from 'flowbite-react';
 import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail } from '../Modules/ApiCrud';
-import Transactions from '../Components/Transactions'
+import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';import Transactions from '../Components/Transactions'
 
-export default function Home() {
+// Modifichiamo la firma della funzione per accettare userData come prop
+export default function Home({ userData: propUserData }) {
   // Utilizziamo useAuth0 per ottenere informazioni sull'autenticazione dell'utente
   const { isAuthenticated, user } = useAuth0();
   
   // Stati per gestire i dati dell'utente, le transazioni e il modale
-  const [userData, setUserData] = useState(null);
+  // Inizializziamo userData con propUserData
+  const [userData, setUserData] = useState(propUserData);
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState(null);
 
-  // Effetto per recuperare i dati dell'utente quando l'autenticazione cambia
+  // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
-    if (isAuthenticated && user) {
+    setUserData(propUserData);
+  }, [propUserData]);
+
+  // Effetto per recuperare i dati dell'utente quando l'autenticazione cambia
+  // Manteniamo questo effetto come fallback nel caso in cui propUserData non sia disponibile
+  useEffect(() => {
+    if (isAuthenticated && user && !userData) {
       fetchUserData();
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, userData]);
 
   // Effetto per recuperare le transazioni quando i dati dell'utente sono disponibili
   useEffect(() => {
@@ -30,10 +37,23 @@ export default function Home() {
   }, [userData]);
 
   // Funzione per recuperare i dati dell'utente dal backend
+  // Manteniamo questa funzione come fallback
   const fetchUserData = async () => {
     try {
-      const data = await getUserByEmail(user.email);
-      setUserData(data);
+      let data;
+      if (user.sub) {
+        // Prova prima con l'Auth0 ID
+        data = await getUserByAuth0Id(user.sub);
+      }
+      if (!data && user.email) {
+        // Se non trova con Auth0 ID e l'email è disponibile, prova con l'email
+        data = await getUserByEmail(user.email);
+      }
+      if (data) {
+        setUserData(data);
+      } else {
+        console.error('Utente non trovato');
+      }
     } catch (error) {
       console.error('Errore nel recupero dei dati utente:', error);
     }
@@ -155,13 +175,12 @@ export default function Home() {
       console.error('Errore nell\'eliminazione della transazione:', error);
     }
   };
-  
 
   // Rendering del componente
   return (
     <div className="container mx-auto p-4 pt-20">
       <div className='flex justify-between'>
-        <h1 className="text-2xl font-bold mb-4">Bentornato, {user.name}</h1>
+        <h1 className="text-2xl font-bold mb-4">Bentornato, {userData?.nome || user.name}</h1>
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
       </div>
       

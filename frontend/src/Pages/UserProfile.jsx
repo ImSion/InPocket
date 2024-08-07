@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useOutletContext, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { updateUser } from "../Modules/ApiCrud";
 
-export default function UserProfile() {
-  const { userData, setUserData } = useOutletContext();
+export default function UserProfile({ userData, updateUserData }) {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
