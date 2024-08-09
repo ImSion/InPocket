@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Card } from 'flowbite-react';
-import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';
 import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';import Transactions from '../Components/Transactions'
 
 // Modifichiamo la firma della funzione per accettare userData come prop
@@ -15,6 +15,7 @@ export default function Home({ userData: propUserData }) {
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState(null);
+  
 
   // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
@@ -62,9 +63,7 @@ export default function Home({ userData: propUserData }) {
   // Funzione per recuperare le transazioni dell'utente dal backend
   const fetchTransactions = async () => {
     try {
-      console.log("Recupero transazioni per l'utente:", userData._id);
       const response = await getUserTransactions(userData._id);
-      console.log("Transazioni recuperate:", response);
       const allTransactions = [...response.data, ...generateRecurringTransactions(response.data)];
       setTransactions(allTransactions);
     } catch (error) {
@@ -83,10 +82,10 @@ export default function Home({ userData: propUserData }) {
       let currentDate = new Date(t.data);
   
       // Controlla se la transazione originale è già nel mese corrente
-      const isOriginalInCurrentMonth = currentDate >= startOfMonth && currentDate <= endOfMonth;
+      const isInCurrentMonth = currentDate >= startOfMonth && currentDate <= endOfMonth;
   
       while (currentDate <= endOfMonth) {
-        if (currentDate >= startOfMonth && (!isOriginalInCurrentMonth || currentDate > today)) {
+        if (currentDate >= startOfMonth && (!isInCurrentMonth || currentDate > today)) {
           generatedTransactions.push({
             ...t,
             data: new Date(currentDate),
@@ -114,6 +113,81 @@ export default function Home({ userData: propUserData }) {
       return generatedTransactions;
     });
   };
+
+
+  const PieExpensesGraphic = ({ data }) => {
+    const { pieData, saldo, totalEntrate, totalUscite } = data;
+    
+    return (
+      <div className="relative">
+        <PieChart width={400} height={400}>
+          <Pie
+            data={pieData}
+            cx={200}
+            cy={200}
+            innerRadius={60}
+            outerRadius={80}
+            paddingAngle={5}
+            dataKey="value"
+          >
+            {pieData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="font-bold">Saldo</div>
+          <div className={saldo >= 0 ? "text-green-500" : "text-red-500"}>
+            €{saldo.toFixed(2)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const pieFinancialData = () => {
+    let totalEntrate = 0;
+    let totalUscite = 0;
+    const usciteColors = [
+      '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', 
+      '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', 
+      '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', 
+      '#FF5722', '#795548', '#9E9E9E', '#607D8B'
+    ];
+  
+    const data = transactions.reduce((acc, t) => {
+      const importo = parseFloat(t.importo);
+      if (t.tipo === 'entrata') {
+        totalEntrate += importo;
+        if (!acc.entrate[t.categoria]) {
+          acc.entrate[t.categoria] = { value: 0, fill: '#4CAF50' };
+        }
+        acc.entrate[t.categoria].value += importo;
+      } else {
+        totalUscite += importo;
+        if (!acc.uscite[t.categoria]) {
+          acc.uscite[t.categoria] = { 
+            value: 0, 
+            fill: usciteColors[Object.keys(acc.uscite).length % usciteColors.length] 
+          };
+        }
+        acc.uscite[t.categoria].value += importo;
+      }
+      return acc;
+    }, { entrate: {}, uscite: {} });
+  
+    const pieData = [
+      ...Object.entries(data.entrate).map(([name, { value, fill }]) => ({ name: `Entrata - ${name}`, value, fill })),
+      ...Object.entries(data.uscite).map(([name, { value, fill }]) => ({ name: `Uscita - ${name}`, value, fill }))
+    ];
+  
+    const saldo = totalEntrate - totalUscite;
+  
+    return { pieData, saldo, totalEntrate, totalUscite };
+  };
+
 
   // Funzione per preparare i dati per il grafico
   const prepareChartData = () => {
@@ -222,6 +296,21 @@ export default function Home({ userData: propUserData }) {
           </ResponsiveContainer>
         </Card>
       </div>
+
+      <Card>
+  <h2 className="text-xl font-semibold mb-2">Ripartizione Finanziaria</h2>
+  <PieExpensesGraphic data={pieFinancialData()} />
+  <div className="mt-4 flex justify-between">
+    <div>
+      <span className="font-bold text-green-500">Entrate totali: </span>
+      €{pieFinancialData().totalEntrate.toFixed(2)}
+    </div>
+    <div>
+      <span className="font-bold text-red-500">Uscite totali: </span>
+      €{pieFinancialData().totalUscite.toFixed(2)}
+    </div>
+  </div>
+</Card>
       
       {/* Pulsante per aggiungere una nuova transazione */}
       <div className="flex justify-center space-x-4 mb-4">

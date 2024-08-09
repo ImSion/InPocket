@@ -22,15 +22,9 @@ export default function Nav({ userData }) {
     navigate('/register');
   };
 
-  const handleLogout = () => {
-    logout({ returnTo: window.location.origin });
-  };
-
-  
-
   return (
-    <Navbar className="fixed w-full" fluid>
-      <NavbarBrand href="">
+    <Navbar className="fixed w-full z-10" fluid>
+      <NavbarBrand href="/home">
         <img src="https://picsum.photos/seed/picsum/200/300" className="mr-3 h-6 sm:h-9" alt="" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
       </NavbarBrand>

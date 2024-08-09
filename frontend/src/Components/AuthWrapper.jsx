@@ -39,15 +39,16 @@ function AuthWrapper() {
     checkUserProfile();
   }, [isAuthenticated, user, location.pathname, navigate]);
 
-  if (isLoading || isProfileComplete === null) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
+    // Reindirizza al componente Login.jsx se l'utente non è autenticato
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!isProfileComplete && location.pathname !== '/register') {
+  if (isProfileComplete === false && location.pathname !== '/register') {
     return <Navigate to="/register" replace />;
   }
 
