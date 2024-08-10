@@ -298,19 +298,19 @@ export default function Home({ userData: propUserData }) {
       </div>
 
       <Card>
-  <h2 className="text-xl font-semibold mb-2">Ripartizione Finanziaria</h2>
-  <PieExpensesGraphic data={pieFinancialData()} />
-  <div className="mt-4 flex justify-between">
-    <div>
-      <span className="font-bold text-green-500">Entrate totali: </span>
-      €{pieFinancialData().totalEntrate.toFixed(2)}
-    </div>
-    <div>
-      <span className="font-bold text-red-500">Uscite totali: </span>
-      €{pieFinancialData().totalUscite.toFixed(2)}
-    </div>
-  </div>
-</Card>
+        <h2 className="text-xl font-semibold mb-2">Ripartizione Finanziaria</h2>
+        <PieExpensesGraphic data={pieFinancialData()} />
+        <div className="mt-4 flex justify-between">
+          <div>
+            <span className="font-bold text-green-500">Entrate totali: </span>
+            €{pieFinancialData().totalEntrate.toFixed(2)}
+          </div>
+          <div>
+            <span className="font-bold text-red-500">Uscite totali: </span>
+            €{pieFinancialData().totalUscite.toFixed(2)}
+          </div>
+        </div>
+      </Card>
       
       {/* Pulsante per aggiungere una nuova transazione */}
       <div className="flex justify-center space-x-4 mb-4">

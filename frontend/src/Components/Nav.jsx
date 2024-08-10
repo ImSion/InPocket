@@ -12,7 +12,10 @@ import {
   NavbarLink,
   NavbarToggle,
   Button,
+  DarkThemeToggle, 
+  Flowbite
 } from "flowbite-react";
+import logo from '../assets/Logo.png'
 
 export default function Nav({ userData }) {
   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
@@ -25,10 +28,12 @@ export default function Nav({ userData }) {
   return (
     <Navbar className="fixed w-full z-10" fluid>
       <NavbarBrand href="/home">
-        <img src="https://picsum.photos/seed/picsum/200/300" className="mr-3 h-6 sm:h-9" alt="" />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">In</span>
+        <img src={logo} className=" h-10 sm:h-9" alt="" />
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ocket</span>
       </NavbarBrand>
-      <div className="flex md:order-2">
+      <div className="flex md:order-2 justify-center items-center">
+        <DarkThemeToggle className="mr-3 hover:shadow-[inset_0px_0px_8px] dark:hover:shadow-amber-300 dark:hover:text-amber-300 hover:shadow-sky-800 hover:text-sky-800 hover:bg-transparent rounded-full border-2 border-slate-500 p-1 w-6 h-6 sm:h-10 sm:w-10 text-center justify-center flex items-center transition-all ease-in-out duration-500 hover:scale-105" />
         {isAuthenticated ? (
           <Dropdown
             arrowIcon={false}
