@@ -114,35 +114,52 @@ export default function Home({ userData: propUserData }) {
     });
   };
 
+  const CustomPieLegend = ({ data }) => (
+    <div className="flex flex-col items-start mt-4">
+      {data.map((entry, index) => (
+        <div key={`legend-item-${index}`} className="flex items-center mb-1">
+          <div 
+            className="w-2 h-2 mr-2" 
+            style={{ backgroundColor: entry.fill }}
+          ></div>
+          <span className='text-sm'>{entry.name}: {entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
 
   const PieExpensesGraphic = ({ data }) => {
     const { pieData, saldo, totalEntrate, totalUscite } = data;
     
     return (
-      <div className="relative">
-        <PieChart width={400} height={400}>
-          <Pie
-            data={pieData}
-            cx={200}
-            cy={200}
-            innerRadius={60}
-            outerRadius={80}
-            paddingAngle={5}
-            dataKey="value"
-          >
-            {pieData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <div className="font-bold">Saldo</div>
-          <div className={saldo >= 0 ? "text-green-500" : "text-red-500"}>
-            €{saldo.toFixed(2)}
+      <div className="flex flex-col md:flex-row items-center justify-center">
+        <div className="relative w-[300px] h-[200px]">
+          <PieChart width={300} height={200}>
+            <Pie
+              data={pieData}
+              cx={145}
+              cy={100}
+              innerRadius={65}
+              outerRadius={80}
+              paddingAngle={3}
+              dataKey="value"
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+          
+          <div className="absolute top-[105px] right-[92px] transform -translate-x-1/2 -translate-y-1/2 text-center">
+            <div className="font-bold">Saldo</div>
+            <div className={saldo >= 0 ? "text-green-500" : "text-red-500"}>
+              €{saldo.toFixed(2)}
+            </div>
           </div>
         </div>
+        
+        <CustomPieLegend data={pieData} />
       </div>
     );
   };
@@ -157,21 +174,23 @@ export default function Home({ userData: propUserData }) {
       '#FF5722', '#795548', '#9E9E9E', '#607D8B'
     ];
   
+    const categoryColorMap = {};
+  
     const data = transactions.reduce((acc, t) => {
       const importo = parseFloat(t.importo);
       if (t.tipo === 'entrata') {
         totalEntrate += importo;
         if (!acc.entrate[t.categoria]) {
           acc.entrate[t.categoria] = { value: 0, fill: '#4CAF50' };
+          categoryColorMap[t.categoria] = '#4CAF50';
         }
         acc.entrate[t.categoria].value += importo;
       } else {
         totalUscite += importo;
         if (!acc.uscite[t.categoria]) {
-          acc.uscite[t.categoria] = { 
-            value: 0, 
-            fill: usciteColors[Object.keys(acc.uscite).length % usciteColors.length] 
-          };
+          const color = usciteColors[Object.keys(acc.uscite).length % usciteColors.length];
+          acc.uscite[t.categoria] = { value: 0, fill: color };
+          categoryColorMap[t.categoria] = color;
         }
         acc.uscite[t.categoria].value += importo;
       }
@@ -185,7 +204,7 @@ export default function Home({ userData: propUserData }) {
   
     const saldo = totalEntrate - totalUscite;
   
-    return { pieData, saldo, totalEntrate, totalUscite };
+    return { pieData, saldo, totalEntrate, totalUscite, categoryColorMap };
   };
 
 
@@ -205,6 +224,62 @@ export default function Home({ userData: propUserData }) {
     });
     return Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
   };
+
+  const { categoryColorMap } = pieFinancialData();
+
+    const barChartData = Object.entries(transactions.reduce((acc, t) => {
+      if (t.tipo === 'uscita') {
+        acc[t.categoria] = (acc[t.categoria] || 0) + parseFloat(t.importo);
+      }
+      return acc;
+    }, {})).map(([name, value]) => ({ 
+      name, 
+      value,
+      fill: categoryColorMap[name] || '#000000'  // Usa il colore mappato o un default
+    }));
+
+    const getYearlyOccurrences = (transaction) => {
+      switch (transaction.frequenzaRicorrenza) {
+        case 'Giornaliera':
+          return 365;
+        case 'Settimanale':
+          return 52;
+        case 'Mensile':
+          return 12;
+        case 'Annuale':
+          return 1;
+        default:
+          return 1;
+      }
+    };
+    
+    const getTopExpenseCategories = () => {
+      let totalAnnualExpenses = 0;
+      const categoryExpenses = transactions.reduce((acc, t) => {
+        if (t.tipo === 'uscita') {
+          // Consideriamo tutte le transazioni, incluse quelle generate
+          const importo = parseFloat(t.importo);
+          if (!acc[t.categoria]) {
+            acc[t.categoria] = {
+              importo: 0,
+              color: categoryColorMap[t.categoria] || '#000000'
+            };
+          }
+          acc[t.categoria].importo += importo;
+          totalAnnualExpenses += importo;
+        }
+        return acc;
+      }, {});
+    
+      return {
+        categories: Object.entries(categoryExpenses)
+          .sort((a, b) => b[1].importo - a[1].importo)
+          .slice(0, 5),
+        totalAnnualExpenses
+      };
+    };
+
+    
 
   // Preparazione dei dati per il grafico
   const chartData = prepareChartData();
@@ -252,13 +327,30 @@ export default function Home({ userData: propUserData }) {
 
   // Rendering del componente
   return (
-    <div className="container mx-auto p-4 pt-20">
+    <div className="container mx-auto p-4">
       <div className='flex justify-between'>
         <h1 className="text-2xl font-bold mb-4">Bentornato, {userData?.nome || user.name}</h1>
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
       </div>
       
       {/* Sezione dei grafici */}
+
+      {/* Grafico a torta */}
+      <div className='w-full flex flex-col items-center justify-center mb-4 border-2 rounded-lg shadow-md'>
+        <h2 className="text-xl font-semibold mb-2 mt-2">Ripartizione Finanziaria</h2>
+        <PieExpensesGraphic data={pieFinancialData()} />
+        <div className="mt-4 flex justify-between w-full px-3 items-center text-center">
+          <div>
+            <span className="font-bold text-green-500">Entrate totali: </span>
+            €{pieFinancialData().totalEntrate.toFixed(2)}
+          </div>
+          <div>
+            <span className="font-bold text-red-500">Uscite totali: </span>
+            €{pieFinancialData().totalUscite.toFixed(2)}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Grafico Entrate/Uscite */}
         <Card>
@@ -280,37 +372,24 @@ export default function Home({ userData: propUserData }) {
         <Card>
           <h2 className="text-xl font-semibold mb-2">Uscite per Categoria</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={Object.entries(transactions.reduce((acc, t) => {
-              if (t.tipo === 'uscita') {
-                acc[t.categoria] = (acc[t.categoria] || 0) + parseFloat(t.importo);
-              }
-              return acc;
-            }, {})).map(([name, value]) => ({ name, value }))}>
+            <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="name" className='text-xs' />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="value" fill="#8884d8" name="Importo" />
+              <Bar dataKey="value" name="Importo">
+                {
+                  barChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))
+                }
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </Card>
       </div>
 
-      <Card>
-        <h2 className="text-xl font-semibold mb-2">Ripartizione Finanziaria</h2>
-        <PieExpensesGraphic data={pieFinancialData()} />
-        <div className="mt-4 flex justify-between">
-          <div>
-            <span className="font-bold text-green-500">Entrate totali: </span>
-            €{pieFinancialData().totalEntrate.toFixed(2)}
-          </div>
-          <div>
-            <span className="font-bold text-red-500">Uscite totali: </span>
-            €{pieFinancialData().totalUscite.toFixed(2)}
-          </div>
-        </div>
-      </Card>
       
       {/* Pulsante per aggiungere una nuova transazione */}
       <div className="flex justify-center space-x-4 mb-4">
@@ -325,13 +404,54 @@ export default function Home({ userData: propUserData }) {
             <li key={transaction._id} className="flex justify-between items-center mb-2">
               <span>{transaction.descrizione} - {transaction.importo} €</span>
               <div className='flex'>
-                <Button size="sm" onClick={() => handleOpenModal(transaction)} className="mr-2">Modifica</Button>
-                <Button size="sm" onClick={() => handleDeleteTransaction(transaction._id)}>Elimina</Button>
+                <Button size="sm" onClick={() => handleOpenModal(transaction)} className="mr-2 w-16 h-7 flex items-center justify-center bg-emerald-600">Modifica</Button>
+                <Button size="sm" onClick={() => handleDeleteTransaction(transaction._id)} className='w-16 h-7 flex items-center justify-center bg-red-600'>Elimina</Button>
               </div>
             </li>
           ))}
         </ul>
       </Card>
+
+      
+      {/* Top Categorie di Spesa */}
+      <Card className="mt-4">
+        <h2 className="text-xl font-semibold mb-2">In cosa spendi di più (Annuale)</h2>
+        {(() => {
+          const { categories, totalAnnualExpenses } = getTopExpenseCategories();
+          if (categories.length === 0) {
+            return <p>Nessuna spesa registrata.</p>;
+          }
+          const maxSpend = categories[0][1].importo; // Il valore più alto
+          return (
+            <>
+              <p className="mb-2">Spese totali annuali: {totalAnnualExpenses.toFixed(2)} €</p>
+              <ul>
+                {categories.map(([categoria, { importo, color }], index) => (
+                  <li key={categoria} className="mb-3">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="flex items-center">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: color}}></div>
+                        {index + 1}. {categoria}
+                      </span>
+                      <span className="font-semibold">{importo.toFixed(2)} €</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="h-2.5 rounded-full" 
+                        style={{
+                          width: `${(importo / maxSpend) * 100}%`,
+                          backgroundColor: color
+                        }}
+                      ></div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          );
+        })()}
+      </Card>
+      
 
       {/* Modale per aggiungere/modificare transazioni */}
       {userData && (

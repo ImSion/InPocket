@@ -10,19 +10,23 @@ import {
     FooterTitle,
   } from "flowbite-react";
   import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-icons/bs";
+  import logo from '../assets/Logo.png'
   
   export default function MyFooter() {
     return (
-      <Footer container className="pt-20">
+      <Footer container className="pb-24 rounded-none">
         <div className="w-full">
           <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-            <div>
-              <FooterBrand
-                href="https://flowbite.com"
-                src="https://flowbite.com/docs/images/logo.svg"
-                alt="Flowbite Logo"
-                name="Flowbite"
-              />
+            <div className="flex justify-center items-center pb-5">
+              <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">In</span>
+                <img
+                src={logo} className=" h-10 sm:h-9" alt="Logo InPocket" 
+                />
+              <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ocket</span>
+
+
+
+              
             </div>
             <div className="grid grid-cols-2 gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
               <div>
