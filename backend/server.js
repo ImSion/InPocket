@@ -5,6 +5,7 @@ import cors from 'cors'; // Middleware per gestire CORS (Cross-Origin Resource S
 import listEndpoints from 'express-list-endpoints' // Utility per elencare gli endpoints dell'app
 import usersRoutes from './routes/usersRoutes.js' // Rotte per gli users
 import transactionRoutes from './routes/transactionsRoutes.js'; // Rotte per le transazioni
+import groupsRoutes from './routes/groupsRoutes.js'; // Rotte per i gruppi
 import session from 'express-session';
 
 // MIDDLEWARE Importazione dei middleware per la gestione degli errori
@@ -51,6 +52,7 @@ mongoose
 
 app.use('/api/users', usersRoutes)
 app.use('/api/transactions', transactionRoutes)
+app.use('/api/groups', groupsRoutes);
 
 const PORT = process.env.PORT || 5002
 

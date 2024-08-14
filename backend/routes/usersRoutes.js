@@ -209,5 +209,46 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// Ricerca utenti
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const users = await Users.find({
+      $or: [
+        { nome: { $regex: q, $options: 'i' } },
+        { cognome: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } }
+      ]
+    }).limit(10);
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Ottieni i gruppi e gli inviti dell'utente
+router.get('/:userId/groups-and-invites', async (req, res) => {
+  try {
+    const user = await Users.findById(req.params.userId)
+      .populate('groups')
+      .populate({
+        path: 'groupInvites.group',
+        model: 'Group'
+      });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
+
+    res.json({
+      groups: user.groups || [],
+      invites: user.groupInvites || []
+    });
+  } catch (error) {
+    console.error('Errore nel recupero dei gruppi e degli inviti:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 export default router

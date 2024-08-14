@@ -51,6 +51,24 @@ const usersSchema = new mongoose.Schema(
       identities: [{
         provider: String,
         user_id: String
+      }],
+      groups: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group'
+      }],
+      groupInvites: [{
+        group: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Group'
+        },
+        invitedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'users'
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
       }]
     },
     {

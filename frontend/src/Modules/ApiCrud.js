@@ -128,3 +128,20 @@ export const getUserData = async () => {
         throw error; // Lancia l'errore per essere gestito dal chiamante
       }
     };
+
+
+// Funzioni per i gruppi
+export const getGroups = () => axiosApi.get('/groups');
+export const createGroup = (groupData) => axiosApi.post('/groups', groupData);
+export const getGroup = (id) => axiosApi.get(`/groups/${id}`);
+export const updateGroup = (id, groupData) => axiosApi.put(`/groups/${id}`, groupData);
+export const deleteGroup = (id) => axiosApi.delete(`/groups/${id}`);
+export const inviteToGroup = (groupId, email) => axiosApi.post(`/groups/${groupId}/invite`, { email });
+export const createTask = (groupId, taskData) => axiosApi.post(`/groups/${groupId}/tasks`, taskData);
+export const updateTask = (groupId, taskId, taskData) => axiosApi.put(`/groups/${groupId}/tasks/${taskId}`, taskData);
+export const getUserGroupsAndInvites = (userId) => axiosApi.get(`/users/${userId}/groups-and-invites`);
+export const acceptGroupInvite = (inviteId) => axiosApi.post(`/groups/accept-invite/${inviteId}`);
+export const rejectGroupInvite = (inviteId) => axiosApi.post(`/groups/reject-invite/${inviteId}`);
+
+// Funzione per la ricerca degli utenti
+export const searchUsers = (query) => axiosApi.get(`/users/search?q=${query}`);

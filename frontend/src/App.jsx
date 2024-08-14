@@ -9,6 +9,7 @@ import UserProfile from './Pages/UserProfile';
 import Home from './Pages/Home';
 import Register from './Pages/Register';
 import Login from './Pages/Login';
+import Groups from './Pages/Groups';
 
 function App() {
   const { isLoading } = useAuth0();
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<Home userData={userData} />} />
           <Route path="home" element={<Home userData={userData} />} />
           <Route path="profile" element={<UserProfile userData={userData} updateUserData={updateUserData} />} />
+          <Route path="/groups" element={<Groups userData={userData} />} />
           <Route path="register" element={<Register userData={userData} updateUserData={updateUserData} />} />
         </Route>
         <Route path="*" element={<Navigate to="/home" replace />} />

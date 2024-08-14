@@ -82,7 +82,7 @@ export default function Nav({ userData }) {
           Home
         </NavbarLink>
         <NavbarLink href="#">About</NavbarLink>
-        <NavbarLink href="#">Services</NavbarLink>
+        <NavbarLink href="/groups">Gruppi</NavbarLink>
         <NavbarLink href="#">Pricing</NavbarLink>
         <NavbarLink href="#">Contact</NavbarLink>
       </NavbarCollapse>
