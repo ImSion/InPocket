@@ -51,13 +51,11 @@ router.get('/', async (req, res) => {
 // Ottieni un gruppo specifico
 router.get('/:id', async (req, res) => {
   try {
-    console.log('Recupero gruppo specifico:', req.params.id);
-    const group = await Group.findOne({ _id: req.params.id, members: req.user._id });
+    const group = await Group.findById(req.params.id).populate('members', 'nome cognome email');
     if (!group) {
-      console.log('Gruppo non trovato');
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
-    console.log('Gruppo trovato:', group);
+    console.log('Gruppo inviato al frontend:', group);
     res.json(group);
   } catch (error) {
     console.error('Errore nel recupero del gruppo:', error);
@@ -207,8 +205,24 @@ router.post('/accept-invite/:inviteId', async (req, res) => {
 router.post('/reject-invite/:inviteId', async (req, res) => {
   try {
     console.log('Rifiuto invito:', req.params.inviteId);
-    await Users.findByIdAndUpdate(req.user._id, {
-      $pull: { groupInvites: { _id: req.params.inviteId } }
+    
+    // Trova l'utente che ha l'invito
+    const user = await Users.findOne({ 'groupInvites._id': req.params.inviteId });
+    if (!user) {
+      console.log('Invito non trovato');
+      return res.status(404).json({ message: 'Invito non trovato' });
+    }
+
+    // Trova l'invito specifico
+    const invite = user.groupInvites.id(req.params.inviteId);
+    if (!invite) {
+      console.log('Invito non trovato');
+      return res.status(404).json({ message: 'Invito non trovato' });
+    }
+
+    console.log('Rimozione dell\'invito');
+    await Users.findByIdAndUpdate(user._id, {
+      $pull: { groupInvites: { _id: invite._id } }
     });
 
     console.log('Invito rifiutato con successo');
@@ -216,6 +230,69 @@ router.post('/reject-invite/:inviteId', async (req, res) => {
   } catch (error) {
     console.error('Errore nel rifiuto dell\'invito:', error);
     res.status(400).json({ message: error.message });
+  }
+});
+
+// Rimuovi un utente dal gruppo (solo per il creatore)
+router.post('/:id/remove-user', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      return res.status(404).json({ message: 'Gruppo non trovato' });
+    }
+
+    // Assumiamo che l'ID del creatore venga inviato nel corpo della richiesta
+    if (group.creator.toString() !== req.body.creatorId) {
+      return res.status(403).json({ message: 'Non autorizzato' });
+    }
+
+    await Group.findByIdAndUpdate(req.params.id, {
+      $pull: { members: req.body.userIdToRemove }
+    });
+
+    await Users.findByIdAndUpdate(req.body.userIdToRemove, {
+      $pull: { groups: req.params.id }
+    });
+
+    res.json({ message: 'Utente rimosso dal gruppo' });
+  } catch (error) {
+    console.error('Errore nella rimozione dell\'utente dal gruppo:', error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Abbandona il gruppo
+router.post('/:id/leave', async (req, res) => {
+  try {
+    console.log('Tentativo di abbandonare il gruppo:', req.params.id);
+    console.log('ID Utente:', req.body.userId); // Assumiamo che l'ID dell'utente venga inviato nel corpo della richiesta
+
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      console.log('Gruppo non trovato');
+      return res.status(404).json({ message: 'Gruppo non trovato' });
+    }
+
+    console.log('Gruppo trovato:', group);
+
+    if (group.creator.toString() === req.body.userId) {
+      console.log('Tentativo del creatore di abbandonare il gruppo');
+      return res.status(400).json({ message: 'Il creatore non può abbandonare il gruppo' });
+    }
+
+    await Group.findByIdAndUpdate(req.params.id, {
+      $pull: { members: req.body.userId }
+    });
+
+    await Users.findByIdAndUpdate(req.body.userId, {
+      $pull: { groups: req.params.id }
+    });
+
+    console.log('Utente rimosso dal gruppo con successo');
+    res.json({ message: 'Hai abbandonato il gruppo' });
+  } catch (error) {
+    console.error('Errore nell\'abbandono del gruppo:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 

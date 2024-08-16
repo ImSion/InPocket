@@ -142,6 +142,9 @@ export const updateTask = (groupId, taskId, taskData) => axiosApi.put(`/groups/$
 export const getUserGroupsAndInvites = (userId) => axiosApi.get(`/users/${userId}/groups-and-invites`);
 export const acceptGroupInvite = (inviteId) => axiosApi.post(`/groups/accept-invite/${inviteId}`);
 export const rejectGroupInvite = (inviteId) => axiosApi.post(`/groups/reject-invite/${inviteId}`);
+export const removeUserFromGroup = (groupId, creatorId, userIdToRemove) => axiosApi.post(`/groups/${groupId}/remove-user`, { creatorId, userIdToRemove });
+export const leaveGroup = (groupId, userId) => axiosApi.post(`/groups/${groupId}/leave`, { userId });
+
 
 // Funzione per la ricerca degli utenti
 export const searchUsers = (query) => axiosApi.get(`/users/search?q=${query}`);

@@ -21,6 +21,8 @@ export default function Nav({ userData }) {
   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
 
+  const profileImage = userData?.avatar || user?.picture;
+
   const handleRegister = () => {
     navigate('/register');
   };
@@ -42,7 +44,7 @@ export default function Nav({ userData }) {
               label={
                 <Avatar 
                   alt="User settings" 
-                  img={user.picture} 
+                  img={profileImage} 
                   rounded 
                 />
               }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateGroup, inviteToGroup, createTask, updateTask } from '../../Modules/ApiCrud';
+import { updateGroup, inviteToGroup, createTask, updateTask, removeUserFromGroup, leaveGroup } from '../../Modules/ApiCrud';
 import TaskList from './TaskList';
 import InviteForm from './InviteForm';
 import { Button, Modal } from 'flowbite-react';
@@ -8,8 +8,10 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const [group, setGroup] = useState(initialGroup);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showMembersList, setShowMembersList] = useState(false);
 
   useEffect(() => {
+    console.log('Gruppo ricevuto:', initialGroup);
     setGroup(initialGroup);
   }, [initialGroup]);
 
@@ -32,6 +34,30 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Errore nell\'eliminazione del gruppo:', error);
+    }
+  };
+
+  const handleRemoveUser = async (userIdToRemove) => {
+    if (window.confirm('Sei sicuro di voler rimuovere questo utente dal gruppo?')) {
+      try {
+        await removeUserFromGroup(group._id, userData._id, userIdToRemove);
+        // Aggiorna lo stato o ricarica i dati del gruppo
+        onUpdate();
+      } catch (error) {
+        console.error('Errore nella rimozione dell\'utente dal gruppo:', error);
+        // Gestisci l'errore (ad esempio, mostrando un messaggio all'utente)
+      }
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    if (window.confirm('Sei sicuro di voler abbandonare questo gruppo?')) {
+      try {
+        await leaveGroup(group._id, userData._id); // Assumendo che userData contenga l'ID dell'utente
+        onUpdate();
+      } catch (error) {
+        console.error('Errore nell\'abbandono del gruppo:', error);
+      }
     }
   };
 
@@ -68,20 +94,19 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     <div className="w-2/3 pl-4">
       <h2 className="text-xl font-semibold mb-2">{group.name}</h2>
       <p>{group.description}</p>
-      <Button 
-        color="success"
-        onClick={() => setShowInviteForm(true)}
-        className="mt-4"
-      >
+      <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4">
         Invita Utente
       </Button>
-      {group.creator === userData._id && (
-        <Button 
-          color="failure"
-          onClick={() => setShowDeleteModal(true)}
-          className="mt-4 ml-2"
-        >
+      <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 ml-2">
+        Mostra Membri
+      </Button>
+      {group.creator === userData._id ? (
+        <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 ml-2">
           Elimina Gruppo
+        </Button>
+      ) : (
+        <Button color="warning" onClick={handleLeaveGroup} className="mt-4 ml-2">
+          Abbandona Gruppo
         </Button>
       )}
       {showInviteForm && (
@@ -96,6 +121,31 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         onUpdateTask={handleUpdateTask}
       />
 
+      <Modal show={showMembersList} onClose={() => setShowMembersList(false)}>
+        <Modal.Header>Membri del Gruppo</Modal.Header>
+        <Modal.Body>
+          <ul>
+          {group.members.map(member => (
+  <li key={member._id} className="flex justify-between items-center mb-2">
+    <div>
+      <span>
+        {member.nome || member.name || 'N/A'} {member.cognome || member.surname || 'N/A'}
+      </span>
+      <span className="ml-2 text-sm text-gray-500">
+        ({member.email || 'Email non disponibile'})
+      </span>
+    </div>
+                {group.creator === userData._id && member._id !== userData._id && (
+                  <Button color="failure" size="sm" onClick={() => handleRemoveUser(member._id)}>
+                    Rimuovi
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Modal.Body>
+      </Modal>
+      
       <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
         <Modal.Header>Conferma eliminazione</Modal.Header>
         <Modal.Body>
