@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite } from '../Modules/ApiCrud';
+import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';
 import GroupList from '../Components/GroupsComponents/GroupList';
 import GroupDetail from '../Components/GroupsComponents/GroupDetail';
 import CreateGroupForm from '../Components/GroupsComponents/CreateGroup';
@@ -46,6 +46,16 @@ export default function Groups({ userData }) {
     }
   };
 
+  const handleDeleteGroup = async (groupId) => {
+    try {
+      await deleteGroup(groupId);
+      await fetchUserGroupsAndInvites();
+      setSelectedGroup(null);
+    } catch (error) {
+      console.error('Errore nell\'eliminazione del gruppo:', error);
+    }
+  };
+
   const handleRejectInvite = async (inviteId) => {
     try {
       await rejectGroupInvite(inviteId);
@@ -83,12 +93,13 @@ export default function Groups({ userData }) {
           />
         </div>
         <div className="w-full md:w-2/3">
-          {selectedGroup && (
-            <GroupDetail 
-              group={selectedGroup} 
-              onUpdate={fetchUserGroupsAndInvites}
-              userData={userData}
-            />
+        {selectedGroup && (
+          <GroupDetail 
+            group={selectedGroup} 
+            onUpdate={fetchUserGroupsAndInvites}
+            onDelete={handleDeleteGroup}
+            userData={userData}  // Passa userData come prop
+          />
           )}
         </div>
       </div>

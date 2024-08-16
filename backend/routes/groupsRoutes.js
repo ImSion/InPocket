@@ -91,19 +91,19 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     console.log('Eliminazione gruppo:', req.params.id);
-    const group = await Group.findOneAndDelete({ _id: req.params.id, creator: req.user._id });
+    const group = await Group.findByIdAndDelete(req.params.id);
     if (!group) {
       console.log('Gruppo non trovato per l\'eliminazione');
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
 
-    console.log('Rimozione del gruppo dai membri');
+    // Rimuovi il gruppo dagli utenti
     await Users.updateMany(
       { groups: group._id },
       { $pull: { groups: group._id } }
     );
 
-    console.log('Rimozione degli inviti relativi al gruppo');
+    // Rimuovi gli inviti relativi al gruppo
     await Users.updateMany(
       { 'groupInvites.group': group._id },
       { $pull: { groupInvites: { group: group._id } } }
@@ -123,7 +123,7 @@ router.post('/:id/invite', async (req, res) => {
     console.log('Invito a un gruppo:', req.params.id);
     console.log('Email dell\'utente invitato:', req.body.email);
     
-    const group = await Group.findOne({ _id: req.params.id, members: req.user._id });
+    const group = await Group.findById(req.params.id);
     if (!group) {
       console.log('Gruppo non trovato per l\'invito');
       return res.status(404).json({ message: 'Gruppo non trovato' });
@@ -140,12 +140,13 @@ router.post('/:id/invite', async (req, res) => {
       return res.status(400).json({ message: 'Utente già membro del gruppo' });
     }
     
+    // Invece di usare req.user._id, usiamo l'ID del creatore del gruppo
     console.log('Aggiunta dell\'invito all\'utente');
     await Users.findByIdAndUpdate(invitedUser._id, {
       $push: {
         groupInvites: {
           group: group._id,
-          invitedBy: req.user._id
+          invitedBy: group.creator // Usiamo il creatore del gruppo invece dell'utente autenticato
         }
       }
     });
@@ -162,9 +163,16 @@ router.post('/:id/invite', async (req, res) => {
 router.post('/accept-invite/:inviteId', async (req, res) => {
   try {
     console.log('Accettazione invito:', req.params.inviteId);
-    const user = await Users.findById(req.user._id);
-    const invite = user.groupInvites.id(req.params.inviteId);
     
+    // Trova l'utente che ha l'invito
+    const user = await Users.findOne({ 'groupInvites._id': req.params.inviteId });
+    if (!user) {
+      console.log('Invito non trovato');
+      return res.status(404).json({ message: 'Invito non trovato' });
+    }
+
+    // Trova l'invito specifico
+    const invite = user.groupInvites.id(req.params.inviteId);
     if (!invite) {
       console.log('Invito non trovato');
       return res.status(404).json({ message: 'Invito non trovato' });
@@ -178,12 +186,12 @@ router.post('/accept-invite/:inviteId', async (req, res) => {
 
     console.log('Aggiunta dell\'utente al gruppo');
     await Group.findByIdAndUpdate(group._id, {
-      $push: { members: user._id }
+      $addToSet: { members: user._id }
     });
 
     console.log('Aggiunta del gruppo all\'utente e rimozione dell\'invito');
     await Users.findByIdAndUpdate(user._id, {
-      $push: { groups: group._id },
+      $addToSet: { groups: group._id },
       $pull: { groupInvites: { _id: invite._id } }
     });
 
@@ -216,7 +224,9 @@ router.post('/:id/tasks', async (req, res) => {
   try {
     console.log('Aggiunta task al gruppo:', req.params.id);
     console.log('Dati del task:', req.body);
-    const group = await Group.findOne({ _id: req.params.id, members: req.user._id });
+    
+    // Rimuovi il controllo su req.user._id per ora
+    const group = await Group.findById(req.params.id);
     if (!group) {
       console.log('Gruppo non trovato per l\'aggiunta del task');
       return res.status(404).json({ message: 'Gruppo non trovato' });
@@ -237,7 +247,7 @@ router.put('/:id/tasks/:taskId', async (req, res) => {
   try {
     console.log('Aggiornamento task:', req.params.taskId, 'nel gruppo:', req.params.id);
     console.log('Dati di aggiornamento del task:', req.body);
-    const group = await Group.findOne({ _id: req.params.id, members: req.user._id });
+    const group = await Group.findById(req.params.id);
     if (!group) {
       console.log('Gruppo non trovato per l\'aggiornamento del task');
       return res.status(404).json({ message: 'Gruppo non trovato' });

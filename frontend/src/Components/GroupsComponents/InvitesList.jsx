@@ -1,6 +1,19 @@
 import React from 'react';
 
 const InvitesList = ({ invites, onAccept, onReject }) => {
+
+  const handleAcceptInvite = async (inviteId) => {
+    try {
+      await acceptGroupInvite(inviteId);
+      // Aggiorna lo stato o ricarica gli inviti
+      // Potresti voler chiamare una funzione per aggiornare la lista degli inviti
+      alert('Invito accettato con successo');
+    } catch (error) {
+      console.error('Errore nell\'accettazione dell\'invito:', error);
+      alert('Errore nell\'accettazione dell\'invito: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
   return (
     <div className="mt-4">
       <h2 className="text-xl font-bold mb-2">Inviti ai Gruppi</h2>
