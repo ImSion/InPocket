@@ -36,14 +36,18 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
 
   const isCreator = group.creator && group.creator._id === userData._id;
 
-  const handleInvite = async (email) => {
+  const handleInvite = async (selectedUser) => {
     try {
-      await inviteToGroup(group._id, email);
+      if (!selectedUser || !selectedUser.email) {
+        throw new Error('Dati utente non validi per l\'invito');
+      }
+      await inviteToGroup(group._id, selectedUser.email);
       await refreshGroupData();
+      setShowInviteForm(false);
       alert('Invito inviato con successo');
     } catch (error) {
       console.error('Errore nell\'invito dell\'utente:', error);
-      alert('Errore nell\'invio dell\'invito: ' + (error.response?.data?.message || error.message));
+      alert('Errore nell\'invio dell\'invito: ' + (error.message || 'Errore sconosciuto'));
     }
   };
 
@@ -64,7 +68,16 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         console.log('ID del creatore:', userData._id);
         const response = await removeUserFromGroup(group._id, userData._id, userIdToRemove);
         console.log('Risposta dal server:', response.data);
-        setGroup(response.data);
+        
+        // Aggiorna lo stato del gruppo con i nuovi dati
+        setGroup(prevGroup => ({
+          ...prevGroup,
+          members: prevGroup.members.filter(member => member._id !== userIdToRemove)
+        }));
+        
+        // Ricarica i dati completi del gruppo
+        await refreshGroupData();
+        
         onUpdate();
       } catch (error) {
         console.error('Errore nella rimozione dell\'utente dal gruppo:', error.response?.data || error.message);
@@ -104,6 +117,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const refreshGroupData = async () => {
     try {
       const response = await getGroup(group._id);
+      console.log('Dati del gruppo aggiornati:', response.data);  // Log per debugging
       setGroup(response.data);
     } catch (error) {
       console.error('Errore nel refresh dei dati del gruppo:', error);
@@ -131,7 +145,8 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       )}
       {showInviteForm && (
         <InviteForm 
-          onSubmit={handleInvite} 
+          groupId={group._id}
+          onSubmit={handleInvite}
           onCancel={() => setShowInviteForm(false)}
         />
       )}

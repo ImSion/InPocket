@@ -24,6 +24,27 @@ router.get('/', async (req,res) => {
     }
 })
 
+// Ricerca utenti 
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ message: 'Query di ricerca mancante' });
+    }
+    const users = await Users.find({
+      $or: [
+        { nome: { $regex: q, $options: 'i' } },
+        { cognome: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } }
+      ]
+    }).limit(10).select('nome cognome email');
+    res.json(users);
+  } catch (error) {
+    console.error('Errore nella ricerca degli utenti:', error); 
+    res.status(500).json({ message: 'Errore interno del server', error: error.message });
+  }
+});
+
 // GET recupero lo user tramite l'ID generato da mongoDB, che incollerò nell'url /api/users/<id>
 router.get('/:id', async (req, res) => {
     try {
@@ -209,22 +230,6 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// Ricerca utenti
-router.get('/search', async (req, res) => {
-  try {
-    const { q } = req.query;
-    const users = await Users.find({
-      $or: [
-        { nome: { $regex: q, $options: 'i' } },
-        { cognome: { $regex: q, $options: 'i' } },
-        { email: { $regex: q, $options: 'i' } }
-      ]
-    }).limit(10);
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 // Ottieni i gruppi e gli inviti dell'utente
 router.get('/:userId/groups-and-invites', async (req, res) => {
