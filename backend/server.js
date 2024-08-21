@@ -7,6 +7,8 @@ import usersRoutes from './routes/usersRoutes.js' // Rotte per gli users
 import transactionRoutes from './routes/transactionsRoutes.js'; // Rotte per le transazioni
 import groupsRoutes from './routes/groupsRoutes.js'; // Rotte per i gruppi
 import session from 'express-session';
+import './models/Users.js';
+import './models/Groups.js';
 
 // MIDDLEWARE Importazione dei middleware per la gestione degli errori
 import {

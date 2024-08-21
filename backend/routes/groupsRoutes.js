@@ -51,11 +51,16 @@ router.get('/', async (req, res) => {
 // Ottieni un gruppo specifico
 router.get('/:id', async (req, res) => {
   try {
-    const group = await Group.findById(req.params.id).populate('members', 'nome cognome email');
+    const group = await Group.findById(req.params.id)
+      .populate('members', 'nome cognome email')
+      .populate('creator', 'nome cognome email')
+      .lean();  // Usa .lean() per ottenere un oggetto JavaScript semplice
+
     if (!group) {
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
-    console.log('Gruppo inviato al frontend:', group);
+
+    console.log('Gruppo inviato al frontend:', JSON.stringify(group, null, 2));
     res.json(group);
   } catch (error) {
     console.error('Errore nel recupero del gruppo:', error);
@@ -236,28 +241,39 @@ router.post('/reject-invite/:inviteId', async (req, res) => {
 // Rimuovi un utente dal gruppo (solo per il creatore)
 router.post('/:id/remove-user', async (req, res) => {
   try {
+    console.log('Rimozione utente dal gruppo:', req.params.id);
+    console.log('Dati ricevuti:', req.body);
+
+    const { creatorId, userIdToRemove } = req.body;
+
+    if (!creatorId || !userIdToRemove) {
+      return res.status(400).json({ message: 'creatorId e userIdToRemove sono richiesti' });
+    }
+
     const group = await Group.findById(req.params.id);
     if (!group) {
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
 
-    // Assumiamo che l'ID del creatore venga inviato nel corpo della richiesta
-    if (group.creator.toString() !== req.body.creatorId) {
+    if (group.creator.toString() !== creatorId) {
       return res.status(403).json({ message: 'Non autorizzato' });
     }
 
-    await Group.findByIdAndUpdate(req.params.id, {
-      $pull: { members: req.body.userIdToRemove }
-    });
+    const updatedGroup = await Group.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { members: userIdToRemove } },
+      { new: true }
+    ).populate('members', 'nome cognome email');
 
-    await Users.findByIdAndUpdate(req.body.userIdToRemove, {
+    await Users.findByIdAndUpdate(userIdToRemove, {
       $pull: { groups: req.params.id }
     });
 
-    res.json({ message: 'Utente rimosso dal gruppo' });
+    console.log('Gruppo aggiornato:', JSON.stringify(updatedGroup, null, 2));
+    res.json(updatedGroup);
   } catch (error) {
     console.error('Errore nella rimozione dell\'utente dal gruppo:', error);
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 });
 

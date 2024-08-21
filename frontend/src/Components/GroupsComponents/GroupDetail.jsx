@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateGroup, inviteToGroup, createTask, updateTask, removeUserFromGroup, leaveGroup } from '../../Modules/ApiCrud';
+import { getGroup, updateGroup, inviteToGroup, createTask, updateTask, removeUserFromGroup, leaveGroup } from '../../Modules/ApiCrud';
 import TaskList from './TaskList';
 import InviteForm from './InviteForm';
 import { Button, Modal } from 'flowbite-react';
@@ -15,15 +15,34 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     setGroup(initialGroup);
   }, [initialGroup]);
 
+  useEffect(() => {
+    const fetchGroupDetails = async () => {
+      try {
+        const response = await getGroup(initialGroup._id);
+        console.log('Dettagli del gruppo recuperati:', response.data);
+        setGroup(response.data);
+      } catch (error) {
+        console.error('Errore nel recupero dei dettagli del gruppo:', error);
+      }
+    };
+  
+    fetchGroupDetails();
+  }, [initialGroup._id]);
+
+  useEffect(() => {
+    console.log('Group creator:', group.creator);
+    console.log('Current user ID:', userData._id);
+  }, [group, userData]);
+
+  const isCreator = group.creator && group.creator._id === userData._id;
+
   const handleInvite = async (email) => {
     try {
       await inviteToGroup(group._id, email);
-      onUpdate();
-      // Aggiungi un feedback all'utente, ad esempio:
+      await refreshGroupData();
       alert('Invito inviato con successo');
     } catch (error) {
       console.error('Errore nell\'invito dell\'utente:', error);
-      // Aggiungi un feedback all'utente, ad esempio:
       alert('Errore nell\'invio dell\'invito: ' + (error.response?.data?.message || error.message));
     }
   };
@@ -40,12 +59,15 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const handleRemoveUser = async (userIdToRemove) => {
     if (window.confirm('Sei sicuro di voler rimuovere questo utente dal gruppo?')) {
       try {
-        await removeUserFromGroup(group._id, userData._id, userIdToRemove);
-        // Aggiorna lo stato o ricarica i dati del gruppo
+        console.log('Rimozione utente:', userIdToRemove);
+        console.log('ID del gruppo:', group._id);
+        console.log('ID del creatore:', userData._id);
+        const response = await removeUserFromGroup(group._id, userData._id, userIdToRemove);
+        console.log('Risposta dal server:', response.data);
+        setGroup(response.data);
         onUpdate();
       } catch (error) {
-        console.error('Errore nella rimozione dell\'utente dal gruppo:', error);
-        // Gestisci l'errore (ad esempio, mostrando un messaggio all'utente)
+        console.error('Errore nella rimozione dell\'utente dal gruppo:', error.response?.data || error.message);
       }
     }
   };
@@ -53,7 +75,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const handleLeaveGroup = async () => {
     if (window.confirm('Sei sicuro di voler abbandonare questo gruppo?')) {
       try {
-        await leaveGroup(group._id, userData._id); // Assumendo che userData contenga l'ID dell'utente
+        await leaveGroup(group._id, userData._id);
         onUpdate();
       } catch (error) {
         console.error('Errore nell\'abbandono del gruppo:', error);
@@ -64,17 +86,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const handleCreateTask = async (taskData) => {
     try {
       const response = await createTask(group._id, taskData);
-      if (response.data && response.data.tasks) {
-        // Assumiamo che la risposta contenga il gruppo aggiornato con la nuova task
-        setGroup(response.data);
-      } else {
-        // Se la risposta non contiene il gruppo aggiornato, aggiungiamo manualmente la task
-        setGroup(prevGroup => ({
-          ...prevGroup,
-          tasks: [...prevGroup.tasks, { ...taskData, _id: Date.now() }] // Usiamo un ID temporaneo
-        }));
-      }
-      onUpdate();
+      await refreshGroupData();
     } catch (error) {
       console.error('Errore nella creazione del task:', error);
     }
@@ -82,11 +94,19 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
 
   const handleUpdateTask = async (taskId, taskData) => {
     try {
-      const response = await updateTask(group._id, taskId, taskData);
-      setGroup(response.data);
-      onUpdate();
+      await updateTask(group._id, taskId, taskData);
+      await refreshGroupData();
     } catch (error) {
       console.error('Errore nell\'aggiornamento del task:', error);
+    }
+  };
+
+  const refreshGroupData = async () => {
+    try {
+      const response = await getGroup(group._id);
+      setGroup(response.data);
+    } catch (error) {
+      console.error('Errore nel refresh dei dati del gruppo:', error);
     }
   };
 
@@ -100,7 +120,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 ml-2">
         Mostra Membri
       </Button>
-      {group.creator === userData._id ? (
+      {isCreator ? (
         <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 ml-2">
           Elimina Gruppo
         </Button>
@@ -126,22 +146,22 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         <Modal.Body>
           <ul>
           {group.members.map(member => (
-  <li key={member._id} className="flex justify-between items-center mb-2">
-    <div>
-      <span>
-        {member.nome || member.name || 'N/A'} {member.cognome || member.surname || 'N/A'}
-      </span>
-      <span className="ml-2 text-sm text-gray-500">
-        ({member.email || 'Email non disponibile'})
-      </span>
-    </div>
-                {group.creator === userData._id && member._id !== userData._id && (
-                  <Button color="failure" size="sm" onClick={() => handleRemoveUser(member._id)}>
-                    Rimuovi
-                  </Button>
-                )}
-              </li>
-            ))}
+            <li key={member._id} className="flex justify-between items-center mb-2">
+              <div>
+                <span>
+                  {member.nome || member.name || 'N/A'} {member.cognome || member.surname || 'N/A'}
+                </span>
+                <span className="ml-2 text-sm text-gray-500">
+                  ({member.email || 'Email non disponibile'})
+                </span>
+              </div>
+              {isCreator && member._id !== userData._id && (
+                <Button color="failure" size="sm" onClick={() => handleRemoveUser(member._id)}>
+                  Rimuovi
+                </Button>
+              )}
+            </li>
+          ))}
           </ul>
         </Modal.Body>
       </Modal>
