@@ -1,6 +1,7 @@
 import express from 'express';
 import Group from '../models/Groups.js';
 import Users from '../models/Users.js';
+import Notification from '../models/Notification.js'
 
 const router = express.Router();
 
@@ -48,6 +49,39 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/notifications/:userId', async (req, res) => {
+  try {
+    console.log('Ricerca notifiche per userId:', req.params.userId);
+    const notifications = await Notification.find({ userId: req.params.userId }).sort('-createdAt');
+    console.log('Notifiche trovate:', notifications);
+    res.json(notifications);
+  } catch (error) {
+    console.error('Errore nel recupero delle notifiche:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post('/notifications', async (req, res) => {
+  try {
+    const newNotification = new Notification(req.body);
+    await newNotification.save();
+    res.status(201).json(newNotification);
+  } catch (error) {
+    console.error('Errore nella creazione della notifica:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete('/notifications/:id', async (req, res) => {
+  try {
+    await Notification.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Notifica eliminata con successo' });
+  } catch (error) {
+    console.error('Errore nell\'eliminazione della notifica:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Ottieni un gruppo specifico
 router.get('/:id', async (req, res) => {
   try {
@@ -59,8 +93,6 @@ router.get('/:id', async (req, res) => {
     if (!group) {
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
-
-    console.log('Gruppo inviato al frontend:', JSON.stringify(group, null, 2));
     res.json(group);
   } catch (error) {
     console.error('Errore nel recupero del gruppo:', error);
@@ -123,42 +155,47 @@ router.delete('/:id', async (req, res) => {
 // Invita un utente al gruppo
 router.post('/:id/invite', async (req, res) => {
   try {
-    console.log('Invito a un gruppo:', req.params.id);
-    console.log('Email dell\'utente invitato:', req.body.email);
-    
     const group = await Group.findById(req.params.id);
     if (!group) {
-      console.log('Gruppo non trovato per l\'invito');
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
     
     const invitedUser = await Users.findOne({ email: req.body.email });
     if (!invitedUser) {
-      console.log('Utente invitato non trovato');
       return res.status(404).json({ message: 'Utente non trovato' });
     }
-    
+
+    // Verifica se l'utente è già membro del gruppo
     if (group.members.includes(invitedUser._id)) {
-      console.log('Utente già membro del gruppo');
       return res.status(400).json({ message: 'Utente già membro del gruppo' });
     }
-    
-    // Invece di usare req.user._id, usiamo l'ID del creatore del gruppo
-    console.log('Aggiunta dell\'invito all\'utente');
+
+    // Aggiungi l'invito
     await Users.findByIdAndUpdate(invitedUser._id, {
-      $push: {
+      $addToSet: {
         groupInvites: {
           group: group._id,
-          invitedBy: group.creator // Usiamo il creatore del gruppo invece dell'utente autenticato
+          invitedBy: req.body.inviterId // Assicurati di inviare l'ID dell'utente che sta invitando
         }
       }
     });
 
-    console.log('Invito inviato con successo');
     res.json({ message: 'Invito inviato con successo' });
   } catch (error) {
     console.error('Errore nell\'invio dell\'invito:', error);
     res.status(400).json({ message: error.message });
+  }
+});
+
+router.get('/notifications/:userId', async (req, res) => {
+  try {
+    const notifications = await Notification.find({ userId: req.params.userId })
+      .sort('-createdAt')
+      .limit(10);
+    res.json(notifications);
+  } catch (error) {
+    console.error('Errore nel recupero delle notifiche:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -312,20 +349,23 @@ router.post('/:id/leave', async (req, res) => {
   }
 });
 
+
 // Aggiungi un task al gruppo
 router.post('/:id/tasks', async (req, res) => {
   try {
     console.log('Aggiunta task al gruppo:', req.params.id);
     console.log('Dati del task:', req.body);
     
-    // Rimuovi il controllo su req.user._id per ora
     const group = await Group.findById(req.params.id);
     if (!group) {
       console.log('Gruppo non trovato per l\'aggiunta del task');
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
     
-    group.tasks.push(req.body);
+    group.tasks.push({
+      ...req.body,
+      createdAt: new Date() // Assicuriamoci che createdAt sia sempre impostato
+    });
     await group.save();
     console.log('Task aggiunto con successo');
     res.status(201).json(group);
@@ -361,5 +401,7 @@ router.put('/:id/tasks/:taskId', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+
 
 export default router;

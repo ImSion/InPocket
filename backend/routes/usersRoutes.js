@@ -1,5 +1,6 @@
 import express from 'express';
 import Users from '../models/Users.js';
+import Notification from '../models/Notification.js';
 import { cloudinaryUploader } from '../config/cloudinaryConfig.js'
 
 const router = express.Router()
@@ -23,6 +24,49 @@ router.get('/', async (req,res) => {
         res.status(500).json({message: error.message})
     }
 })
+
+router.get('/check-invites', async (req, res) => {
+  try {
+    const auth0Id = req.query.userId;
+    
+    if (!auth0Id) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const user = await Users.findOne({ 'identities.user_id': auth0Id }).select('groupInvites');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const hasNewInvite = user.groupInvites.length > 0;
+    res.json({ hasNewInvite });
+  } catch (error) {
+    console.error('Error checking invites:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Ottieni le notifiche dell'utente
+router.get('/notifications', async (req, res) => {
+  try {
+    const userId = req.user._id; // Assumendo che l'utente sia autenticato
+    const notifications = await Notification.find({ userId }).sort('-createdAt').limit(10);
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Elimina una notifica
+router.delete('/notifications/:id', async (req, res) => {
+  try {
+    const userId = req.user._id; // Assumendo che l'utente sia autenticato
+    await Notification.findOneAndDelete({ _id: req.params.id, userId });
+    res.json({ message: 'Notifica eliminata con successo' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Ricerca utenti 
 router.get('/search', async (req, res) => {

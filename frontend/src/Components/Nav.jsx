@@ -16,10 +16,18 @@ import {
   Flowbite
 } from "flowbite-react";
 import logo from '../assets/Logo.png'
+import Notifications from './Notifications';
+import { useContext, useEffect } from 'react';
+import { NotificationContext, NotificationProvider } from '../Contexts/NotificationContext.jsx';
 
 export default function Nav({ userData }) {
   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
+  const { hasNewInvite, checkInvites } = useContext(NotificationContext);
+
+  useEffect(() => {
+    checkInvites();
+  }, [checkInvites]);
 
   const profileImage = userData?.avatar || user?.picture;
 
@@ -36,6 +44,7 @@ export default function Nav({ userData }) {
       </NavbarBrand>
       <div className="flex md:order-2 justify-center items-center">
         <DarkThemeToggle className="mr-3 hover:shadow-[inset_0px_0px_8px] dark:hover:shadow-amber-300 dark:hover:text-amber-300 hover:shadow-sky-800 hover:text-sky-800 hover:bg-transparent rounded-full border-2 border-slate-500 p-1 w-10 h-10 sm:h-10 sm:w-10 text-center justify-center flex items-center transition-all ease-in-out duration-500 hover:scale-105" />
+        {isAuthenticated && <Notifications notifications={Notifications} />}
         {isAuthenticated ? (
           <>
             <Dropdown
@@ -83,10 +92,7 @@ export default function Nav({ userData }) {
         <NavbarLink href="/home" active>
           Home
         </NavbarLink>
-        <NavbarLink href="#">About</NavbarLink>
         <NavbarLink href="/groups">Gruppi</NavbarLink>
-        <NavbarLink href="#">Pricing</NavbarLink>
-        <NavbarLink href="#">Contact</NavbarLink>
       </NavbarCollapse>
     </Navbar>
   );

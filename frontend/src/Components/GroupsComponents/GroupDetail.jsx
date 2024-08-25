@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getGroup, updateGroup, inviteToGroup, createTask, updateTask, removeUserFromGroup, leaveGroup } from '../../Modules/ApiCrud';
 import TaskList from './TaskList';
 import InviteForm from './InviteForm';
+import axios from 'axios';
+import Calendar from './Calendar';
 import { Button, Modal } from 'flowbite-react';
+import { NotificationContext } from '../../Contexts/NotificationContext';
 
 export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, userData }) {
   const [group, setGroup] = useState(initialGroup);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showMembersList, setShowMembersList] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const { addNotification, showAlert  } = useContext(NotificationContext);
 
   useEffect(() => {
     console.log('Gruppo ricevuto:', initialGroup);
@@ -32,22 +37,37 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   useEffect(() => {
     console.log('Group creator:', group.creator);
     console.log('Current user ID:', userData._id);
+    checkOverdueTasks();
   }, [group, userData]);
 
   const isCreator = group.creator && group.creator._id === userData._id;
 
+  const checkOverdueTasks = () => {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  
+    const overdueTasks = group.tasks.filter(task => {
+      const createdAt = new Date(task.createdAt);
+      return !task.completed && createdAt <= threeDaysAgo;
+    });
+  
+    if (overdueTasks.length > 0) {
+      addNotification({ 
+        type: 'task', 
+        message: `Ci sono ${overdueTasks.length} task non completate da più di 3 giorni!` 
+      });
+    }
+  };
+
   const handleInvite = async (selectedUser) => {
     try {
-      if (!selectedUser || !selectedUser.email) {
-        throw new Error('Dati utente non validi per l\'invito');
-      }
-      await inviteToGroup(group._id, selectedUser.email);
+      await inviteToGroup(group._id, selectedUser.email, userData._id);
       await refreshGroupData();
       setShowInviteForm(false);
-      alert('Invito inviato con successo');
+      showAlert('Invito inviato con successo');
     } catch (error) {
       console.error('Errore nell\'invito dell\'utente:', error);
-      alert('Errore nell\'invio dell\'invito: ' + (error.message || 'Errore sconosciuto'));
+      showAlert('Errore nell\'invio dell\'invito: ' + (error.response?.data?.message || error.message), 'error');
     }
   };
 
@@ -69,13 +89,11 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         const response = await removeUserFromGroup(group._id, userData._id, userIdToRemove);
         console.log('Risposta dal server:', response.data);
         
-        // Aggiorna lo stato del gruppo con i nuovi dati
         setGroup(prevGroup => ({
           ...prevGroup,
           members: prevGroup.members.filter(member => member._id !== userIdToRemove)
         }));
         
-        // Ricarica i dati completi del gruppo
         await refreshGroupData();
         
         onUpdate();
@@ -98,7 +116,11 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
 
   const handleCreateTask = async (taskData) => {
     try {
-      const response = await createTask(group._id, taskData);
+      const newTask = { 
+        ...taskData, 
+        createdAt: new Date(),
+      };
+      const response = await createTask(group._id, newTask);
       await refreshGroupData();
     } catch (error) {
       console.error('Errore nella creazione del task:', error);
@@ -117,7 +139,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const refreshGroupData = async () => {
     try {
       const response = await getGroup(group._id);
-      console.log('Dati del gruppo aggiornati:', response.data);  // Log per debugging
+      console.log('Dati del gruppo aggiornati:', response.data);
       setGroup(response.data);
     } catch (error) {
       console.error('Errore nel refresh dei dati del gruppo:', error);
@@ -125,24 +147,28 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   };
 
   return (
-    <div className="w-2/3 pl-4">
-      <h2 className="text-xl font-semibold mb-2">{group.name}</h2>
+    <div className="w-full">
+      <h2 className="text-xl font-semibold mb-2">Gruppo: {group.name}</h2>
       <p>{group.description}</p>
-      <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4">
-        Invita Utente
-      </Button>
-      <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 ml-2">
-        Mostra Membri
-      </Button>
-      {isCreator ? (
-        <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 ml-2">
-          Elimina Gruppo
+
+      <div className='flex'>
+        <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4 h-10 flex justify-center items-center p-2 py-5">
+          Invita Utente
         </Button>
-      ) : (
-        <Button color="warning" onClick={handleLeaveGroup} className="mt-4 ml-2">
-          Abbandona Gruppo
+        <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 ml-2 h-10 flex justify-center items-center p-2 py-5">
+          Mostra Membri
         </Button>
-      )}
+        {isCreator ? (
+          <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 ml-2 h-10 flex justify-center items-center p-2 py-5">
+            Elimina Gruppo
+          </Button>
+        ) : (
+          <Button color="warning" onClick={handleLeaveGroup} className="mt-4 ml-2">
+            Abbandona Gruppo
+          </Button>
+        )}
+      </div>
+
       {showInviteForm && (
         <InviteForm 
           groupId={group._id}
@@ -150,11 +176,25 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
           onCancel={() => setShowInviteForm(false)}
         />
       )}
-      <TaskList 
-        tasks={group.tasks} 
-        onCreateTask={handleCreateTask}
-        onUpdateTask={handleUpdateTask}
-      />
+      
+      <div className="flex flex-col justify-center items-center mt-4">
+        <div className="w-full">
+          <Calendar 
+            tasks={group.tasks} 
+            onSelectDate={setSelectedDate}
+          />
+        </div>
+        <div className="w-full">
+          <TaskList 
+            tasks={group.tasks.filter(task => 
+              new Date(task.createdAt).toDateString() === selectedDate.toDateString()
+            )}
+            onCreateTask={handleCreateTask}
+            onUpdateTask={handleUpdateTask}
+            selectedDate={selectedDate}
+          />
+        </div>
+      </div>
 
       <Modal show={showMembersList} onClose={() => setShowMembersList(false)}>
         <Modal.Header>Membri del Gruppo</Modal.Header>

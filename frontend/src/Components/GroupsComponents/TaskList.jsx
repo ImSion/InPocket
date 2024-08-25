@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, TextInput } from 'flowbite-react';
 
-export default function TaskList({ tasks, onCreateTask, onUpdateTask }) {
+export default function TaskList({ tasks, onCreateTask, onUpdateTask, selectedDate }) {
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
@@ -32,8 +32,8 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask }) {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mt-4 mb-2">Tasks</h3>
-      <form onSubmit={handleCreateTask} className="mb-4">
+      <h3 className="text-lg font-semibold mt-4 mb-2">Tasks per {selectedDate.toLocaleDateString()}</h3>
+      <form onSubmit={handleCreateTask} className="mb-4 flex">
         <TextInput
           type="text"
           placeholder="Nuovo task"

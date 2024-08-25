@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';
 import GroupList from '../Components/GroupsComponents/GroupList';
 import GroupDetail from '../Components/GroupsComponents/GroupDetail';
 import CreateGroupForm from '../Components/GroupsComponents/CreateGroup';
 import InvitesList from '../Components/GroupsComponents/InvitesList';
+import { NotificationContext, NotificationProvider } from '../Contexts/NotificationContext';
 
 export default function Groups({ userData }) {
   const [groups, setGroups] = useState([]);
   const [invites, setInvites] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const { addNotification, showAlert } = useContext(NotificationContext);
 
   useEffect(() => {
     if (userData) {
       fetchUserGroupsAndInvites();
     }
   }, [userData]);
+
 
   const fetchUserGroupsAndInvites = async () => {
     try {
@@ -41,8 +44,10 @@ export default function Groups({ userData }) {
     try {
       await acceptGroupInvite(inviteId);
       fetchUserGroupsAndInvites();
+      showAlert(`Hai accettato l'invito al gruppo`);
     } catch (error) {
       console.error('Errore nell\'accettare l\'invito:', error);
+      showAlert('Errore nell\'accettare l\'invito', 'error');
     }
   };
 
@@ -60,13 +65,15 @@ export default function Groups({ userData }) {
     try {
       await rejectGroupInvite(inviteId);
       fetchUserGroupsAndInvites();
+      showAlert('Invito rifiutato');
     } catch (error) {
       console.error('Errore nel rifiutare l\'invito:', error);
+      showAlert('Errore nel rifiutare l\'invito', 'error');
     }
   };
 
   return (
-    <div className="container mx-auto p-4 min-h-screen">
+    <div className=" mx-auto p-4 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">I tuoi Gruppi</h1>
       <button 
         onClick={() => setShowCreateForm(true)}
@@ -98,7 +105,7 @@ export default function Groups({ userData }) {
             group={selectedGroup} 
             onUpdate={fetchUserGroupsAndInvites}
             onDelete={handleDeleteGroup}
-            userData={userData}  // Passa userData come prop
+            userData={userData}
           />
           )}
         </div>

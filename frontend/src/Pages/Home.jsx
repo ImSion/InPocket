@@ -353,7 +353,7 @@ export default function Home({ userData: propUserData }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Grafico Entrate/Uscite */}
-        <Card>
+        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center'>
           <h2 className="text-xl font-semibold mb-2">Entrate/Uscite</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
@@ -366,10 +366,10 @@ export default function Home({ userData: propUserData }) {
               <Line type="monotone" dataKey="uscite" stroke="#82ca9d" name="Uscite" />
             </LineChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
         
         {/* Grafico Uscite per Categoria */}
-        <Card>
+        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center'>
           <h2 className="text-xl font-semibold mb-2">Uscite per Categoria</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={barChartData}>
@@ -387,7 +387,7 @@ export default function Home({ userData: propUserData }) {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
       </div>
 
       

@@ -10,6 +10,7 @@ import Home from './Pages/Home';
 import Register from './Pages/Register';
 import Login from './Pages/Login';
 import Groups from './Pages/Groups';
+import { NotificationContext, NotificationProvider } from './Contexts/NotificationContext.jsx';
 
 function App() {
   const { isLoading } = useAuth0();
@@ -20,21 +21,23 @@ function App() {
   }
 
   return (
-    <Router>
-      <Nav userData={userData} />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route element={<AuthWrapper />}>
-          <Route path="/" element={<Home userData={userData} />} />
-          <Route path="home" element={<Home userData={userData} />} />
-          <Route path="profile" element={<UserProfile userData={userData} updateUserData={updateUserData} />} />
-          <Route path="/groups" element={<Groups userData={userData} />} />
-          <Route path="register" element={<Register userData={userData} updateUserData={updateUserData} />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/home" replace />} />
-      </Routes>
-      <MyFooter />
-    </Router>
+    <NotificationProvider>
+      <Router>
+        <Nav userData={userData} />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<AuthWrapper />}>
+            <Route path="/" element={<Home userData={userData} />} />
+            <Route path="home" element={<Home userData={userData} />} />
+            <Route path="profile" element={<UserProfile userData={userData} updateUserData={updateUserData} />} />
+            <Route path="/groups" element={<Groups userData={userData} />} />
+            <Route path="register" element={<Register userData={userData} updateUserData={updateUserData} />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+        <MyFooter />
+      </Router>
+    </NotificationProvider>
   );
 }
 
