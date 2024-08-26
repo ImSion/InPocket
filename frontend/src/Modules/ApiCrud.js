@@ -145,7 +145,27 @@ export const inviteToGroup = async (groupId, userEmail, inviterId) => {
     throw error;
   }
 };
-export const createTask = (groupId, taskData) => axiosApi.post(`/groups/${groupId}/tasks`, taskData);
+export const createTask = async (groupId, taskData) => {
+  try {
+    console.log('Dati task da inviare:', taskData);
+    const response = await axiosApi.post(`/groups/${groupId}/tasks`, taskData);
+    console.log('Risposta del server:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Errore dettagliato nella creazione della task:', error.response?.data || error.message);
+    throw error;
+  }
+};
+export const deleteTask = async (groupId, taskId) => {
+  try {
+    const response = await axiosApi.delete(`/groups/${groupId}/tasks/${taskId}`);
+    console.log('Task eliminata:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Errore nell\'eliminazione della task:', error);
+    throw error;
+  }
+};
 export const updateTask = (groupId, taskId, taskData) => axiosApi.put(`/groups/${groupId}/tasks/${taskId}`, taskData);
 export const getUserGroupsAndInvites = (userId) => axiosApi.get(`/users/${userId}/groups-and-invites`);
 export const acceptGroupInvite = (inviteId) => axiosApi.post(`/groups/accept-invite/${inviteId}`);

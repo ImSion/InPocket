@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { Button, Modal, TextInput } from 'flowbite-react';
 
-export default function TaskList({ tasks, onCreateTask, onUpdateTask, selectedDate }) {
+export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTask, selectedDate }) {
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [completionNote, setCompletionNote] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const handleCreateTask = (e) => {
     e.preventDefault();
     if (newTaskDescription.trim()) {
-      onCreateTask({ description: newTaskDescription.trim() });
+      onCreateTask({ 
+        description: newTaskDescription.trim(),
+        scheduledDate: selectedDate 
+      });
       setNewTaskDescription('');
     }
   };
@@ -28,6 +32,10 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, selectedDa
   const handleUpdateTask = () => {
     onUpdateTask(currentTask._id, { completed: true, completionNote });
     setShowUpdateModal(false);
+  };
+
+  const handleDeleteTask = (taskId) => {
+    onDeleteTask(taskId);
   };
 
   return (
@@ -53,9 +61,24 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, selectedDa
               onChange={() => handleCompleteTask(task)}
               className="mr-2"
             />
-            <span className={task.completed ? 'line-through' : ''}>{task.description}</span>
+            <span 
+              className={`flex-grow cursor-pointer ${task.completed ? 'line-through' : ''}`}
+              onClick={() => setSelectedTaskId(selectedTaskId === task._id ? null : task._id)}
+            >
+              {task.description}
+            </span>
             {task.completed && task.completionNote && (
               <span className="ml-2 text-sm text-gray-500">({task.completionNote})</span>
+            )}
+            {selectedTaskId === task._id && (
+              <Button 
+                color="failure" 
+                size="xs" 
+                onClick={() => handleDeleteTask(task._id)}
+                className="ml-2"
+              >
+                Elimina
+              </Button>
             )}
           </li>
         ))}

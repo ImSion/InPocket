@@ -353,25 +353,29 @@ router.post('/:id/leave', async (req, res) => {
 // Aggiungi un task al gruppo
 router.post('/:id/tasks', async (req, res) => {
   try {
-    console.log('Aggiunta task al gruppo:', req.params.id);
-    console.log('Dati del task:', req.body);
+    console.log('Dati completi ricevuti per la creazione del task:', req.body);
     
     const group = await Group.findById(req.params.id);
     if (!group) {
-      console.log('Gruppo non trovato per l\'aggiunta del task');
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
     
-    group.tasks.push({
-      ...req.body,
-      createdAt: new Date() // Assicuriamoci che createdAt sia sempre impostato
-    });
-    await group.save();
+    const newTask = {
+      description: req.body.description,
+      scheduledDate: new Date(req.body.scheduledDate),
+      createdAt: new Date(req.body.createdAt || Date.now())
+    };
+    
+    console.log('Nuovo task da aggiungere:', newTask);
+    
+    group.tasks.push(newTask);
+    const updatedGroup = await group.save();
+    
     console.log('Task aggiunto con successo');
-    res.status(201).json(group);
+    res.status(201).json(updatedGroup);
   } catch (error) {
-    console.error('Errore nell\'aggiunta del task:', error);
-    res.status(400).json({ message: error.message });
+    console.error('Errore dettagliato nell\'aggiunta del task:', error);
+    res.status(400).json({ message: error.message, details: error.errors });
   }
 });
 
@@ -392,13 +396,34 @@ router.put('/:id/tasks/:taskId', async (req, res) => {
       return res.status(404).json({ message: 'Task non trovato' });
     }
     
+    if (req.body.scheduledDate) {
+      req.body.scheduledDate = new Date(req.body.scheduledDate);
+    }
+    
     Object.assign(task, req.body);
     await group.save();
-    console.log('Task aggiornato con successo');
+    console.log('Task aggiornato con successo:', task);
     res.json(group);
   } catch (error) {
     console.error('Errore nell\'aggiornamento del task:', error);
     res.status(400).json({ message: error.message });
+  }
+});
+
+router.delete('/:id/tasks/:taskId', async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      return res.status(404).json({ message: 'Gruppo non trovato' });
+    }
+    
+    group.tasks = group.tasks.filter(task => task._id.toString() !== req.params.taskId);
+    await group.save();
+    
+    res.json({ message: 'Task eliminata con successo' });
+  } catch (error) {
+    console.error('Errore nell\'eliminazione del task:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 

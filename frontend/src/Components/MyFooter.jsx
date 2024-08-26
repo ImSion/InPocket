@@ -14,7 +14,7 @@ import {
   
   export default function MyFooter() {
     return (
-      <Footer container className="pb-24 rounded-none">
+      <Footer container className="pb-24 rounded-none bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
         <div className="w-full">
           <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
             <div className="flex justify-center items-center pb-5">

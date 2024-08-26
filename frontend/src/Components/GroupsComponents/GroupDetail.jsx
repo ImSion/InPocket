@@ -4,6 +4,7 @@ import TaskList from './TaskList';
 import InviteForm from './InviteForm';
 import axios from 'axios';
 import Calendar from './Calendar';
+import { deleteTask } from '../../Modules/ApiCrud';
 import { Button, Modal } from 'flowbite-react';
 import { NotificationContext } from '../../Contexts/NotificationContext';
 
@@ -117,10 +118,13 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const handleCreateTask = async (taskData) => {
     try {
       const newTask = { 
-        ...taskData, 
-        createdAt: new Date(),
+        ...taskData,
+        scheduledDate: selectedDate.toISOString(),
+        createdAt: new Date().toISOString(),
       };
+      console.log('Creazione nuova task:', newTask);
       const response = await createTask(group._id, newTask);
+      console.log('Risposta creazione task:', response);
       await refreshGroupData();
     } catch (error) {
       console.error('Errore nella creazione del task:', error);
@@ -135,6 +139,16 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       console.error('Errore nell\'aggiornamento del task:', error);
     }
   };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(group._id, taskId);
+      await refreshGroupData();
+    } catch (error) {
+      console.error('Errore nell\'eliminazione del task:', error);
+    }
+  };
+
 
   const refreshGroupData = async () => {
     try {
@@ -179,20 +193,24 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       
       <div className="flex flex-col justify-center items-center mt-4">
         <div className="w-full">
-          <Calendar 
-            tasks={group.tasks} 
-            onSelectDate={setSelectedDate}
-          />
+        <Calendar 
+  tasks={group.tasks} 
+  onSelectDate={(date) => {
+    console.log('Data selezionata in Calendar:', date);
+    setSelectedDate(date);
+  }}
+/>
         </div>
         <div className="w-full">
-          <TaskList 
-            tasks={group.tasks.filter(task => 
-              new Date(task.createdAt).toDateString() === selectedDate.toDateString()
-            )}
-            onCreateTask={handleCreateTask}
-            onUpdateTask={handleUpdateTask}
-            selectedDate={selectedDate}
-          />
+        <TaskList 
+      tasks={group.tasks.filter(task => 
+        new Date(task.scheduledDate).toDateString() === selectedDate.toDateString()
+      )}
+      onCreateTask={(taskData) => handleCreateTask({...taskData, scheduledDate: selectedDate})}
+      onUpdateTask={handleUpdateTask}
+      onDeleteTask={handleDeleteTask}
+      selectedDate={selectedDate}
+    />
         </div>
       </div>
 

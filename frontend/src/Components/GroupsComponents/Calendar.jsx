@@ -30,8 +30,9 @@ const mesiItaliani = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugn
 const giorniItaliani = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 
 export default function Calendar({ tasks, onSelectDate }) {
+  // Raggruppa le task per data usando scheduledDate invece di createdAt
   const tasksByDate = tasks.reduce((acc, task) => {
-    const date = moment(task.createdAt).format('YYYY-MM-DD');
+    const date = moment(task.scheduledDate).format('YYYY-MM-DD');
     if (!acc[date]) {
       acc[date] = [];
     }
@@ -39,6 +40,7 @@ export default function Calendar({ tasks, onSelectDate }) {
     return acc;
   }, {});
 
+  // Crea gli eventi per il calendario con il conteggio delle task
   const events = Object.entries(tasksByDate).map(([date, tasksForDate]) => ({
     title: `${tasksForDate.length} task${tasksForDate.length > 1 ? 's' : ''}`,
     start: new Date(date),
@@ -63,6 +65,7 @@ export default function Calendar({ tasks, onSelectDate }) {
         startAccessor="start"
         endAccessor="end"
         onSelectSlot={({ start }) => onSelectDate(start)}
+        onSelectEvent={(event) => onSelectDate(event.start)}
         selectable
         views={['month', 'week', 'day']}
         messages={messages}
