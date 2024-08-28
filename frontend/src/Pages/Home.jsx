@@ -3,6 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Button, Card } from 'flowbite-react';
 import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';
 import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';import Transactions from '../Components/Transactions'
+import '../Style/MainCSS.css'
 
 // Modifichiamo la firma della funzione per accettare userData come prop
 export default function Home({ userData: propUserData }) {
@@ -122,7 +123,7 @@ export default function Home({ userData: propUserData }) {
             className="w-2 h-2 mr-2" 
             style={{ backgroundColor: entry.fill }}
           ></div>
-          <span className='text-sm'>{entry.name}: {entry.value}</span>
+          <span className='text-sm dark:text-white'>{entry.name}: {entry.value}</span>
         </div>
       ))}
     </div>
@@ -152,7 +153,7 @@ export default function Home({ userData: propUserData }) {
           </PieChart>
           
           <div className="absolute top-[105px] right-[92px] transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <div className="font-bold">Saldo</div>
+            <div className="font-bold dark:text-white">Saldo</div>
             <div className={saldo >= 0 ? "text-green-500" : "text-red-500"}>
               €{saldo.toFixed(2)}
             </div>
@@ -329,31 +330,31 @@ export default function Home({ userData: propUserData }) {
   return (
     <div className="container mx-auto p-4">
       <div className='flex justify-between'>
-        <h1 className="text-2xl font-bold mb-4">Bentornato, {userData?.nome || user.name}</h1>
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw">Bentornato, {userData?.nome || user.name}</h1>
+        <h1 className="text-2xl font-bold mb-4 dark:text-white dark:shadow-lg">Dashboard</h1>
       </div>
       
       {/* Sezione dei grafici */}
 
       {/* Grafico a torta */}
-      <div className='w-full flex flex-col items-center justify-center mb-4 border-2 rounded-lg shadow-md'>
-        <h2 className="text-xl font-semibold mb-2 mt-2">Ripartizione Finanziaria</h2>
-        <PieExpensesGraphic data={pieFinancialData()} />
+      <div className='w-full flex flex-col items-center justify-center mb-4 border-2 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90' >
+        <h2 className="text-xl font-semibold mb-2 mt-2 dark:text-white">Ripartizione Finanziaria</h2>
+        <PieExpensesGraphic data={pieFinancialData()}/>
         <div className="mt-4 flex justify-between w-full px-3 items-center text-center">
           <div>
             <span className="font-bold text-green-500">Entrate totali: </span>
-            €{pieFinancialData().totalEntrate.toFixed(2)}
+            <span className="dark:text-white">€{pieFinancialData().totalEntrate.toFixed(2)}</span>
           </div>
           <div>
             <span className="font-bold text-red-500">Uscite totali: </span>
-            €{pieFinancialData().totalUscite.toFixed(2)}
+            <span className="dark:text-white">€{pieFinancialData().totalEntrate.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Grafico Entrate/Uscite */}
-        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center'>
+        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
           <h2 className="text-xl font-semibold mb-2">Entrate/Uscite</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
@@ -369,16 +370,16 @@ export default function Home({ userData: propUserData }) {
         </div>
         
         {/* Grafico Uscite per Categoria */}
-        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center'>
-          <h2 className="text-xl font-semibold mb-2">Uscite per Categoria</h2>
+        <div className='flex-col h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+          <h2 className="text-xl font-semibold mb-2 dark:text-white">Uscite per Categoria</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" className='text-xs' />
+              <XAxis dataKey="name" className='text-[12px]' />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="value" name="Importo">
+              <Bar fill='' dataKey="value" name="Importo">
                 {
                   barChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -392,16 +393,16 @@ export default function Home({ userData: propUserData }) {
 
       
       {/* Pulsante per aggiungere una nuova transazione */}
-      <div className="flex justify-center space-x-4 mb-4">
+      <div className="flex justify-center space-x-4 mb-4 ">
         <Button onClick={() => handleOpenModal()}>Aggiungi Transazione</Button>
       </div>
       
       {/* Lista delle transazioni recenti */}
-      <Card>
-        <h2 className="text-xl font-semibold mb-2">Transazioni Recenti</h2>
+      <Card className='bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+        <h2 className="text-xl font-semibold mb-2 dark:text-white">Transazioni Recenti</h2>
         <ul>
           {transactions.slice(0, 10).map((transaction) => (
-            <li key={transaction._id} className="flex justify-between items-center mb-2">
+            <li key={transaction._id} className="flex justify-between w-96 items-center mb-2 dark:text-white">
               <span>{transaction.descrizione} - {transaction.importo} €</span>
               <div className='flex'>
                 <Button size="sm" onClick={() => handleOpenModal(transaction)} className="mr-2 w-16 h-7 flex items-center justify-center bg-emerald-600">Modifica</Button>
@@ -414,8 +415,8 @@ export default function Home({ userData: propUserData }) {
 
       
       {/* Top Categorie di Spesa */}
-      <Card className="mt-4">
-        <h2 className="text-xl font-semibold mb-2">In cosa spendi di più (Annuale)</h2>
+      <Card className="mt-4 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
+        <h2 className="text-xl font-semibold mb-2 dark:text-white">In cosa spendi di più (Annuale)</h2>
         {(() => {
           const { categories, totalAnnualExpenses } = getTopExpenseCategories();
           if (categories.length === 0) {
@@ -424,10 +425,10 @@ export default function Home({ userData: propUserData }) {
           const maxSpend = categories[0][1].importo; // Il valore più alto
           return (
             <>
-              <p className="mb-2">Spese totali annuali: {totalAnnualExpenses.toFixed(2)} €</p>
+              <p className="mb-2 dark:text-white">Spese totali annuali: {totalAnnualExpenses.toFixed(2)} €</p>
               <ul>
                 {categories.map(([categoria, { importo, color }], index) => (
-                  <li key={categoria} className="mb-3">
+                  <li key={categoria} className="mb-3 dark:text-white">
                     <div className="flex justify-between items-center mb-1">
                       <span className="flex items-center">
                         <div className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: color}}></div>

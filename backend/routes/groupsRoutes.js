@@ -49,39 +49,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/notifications/:userId', async (req, res) => {
-  try {
-    console.log('Ricerca notifiche per userId:', req.params.userId);
-    const notifications = await Notification.find({ userId: req.params.userId }).sort('-createdAt');
-    console.log('Notifiche trovate:', notifications);
-    res.json(notifications);
-  } catch (error) {
-    console.error('Errore nel recupero delle notifiche:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-router.post('/notifications', async (req, res) => {
-  try {
-    const newNotification = new Notification(req.body);
-    await newNotification.save();
-    res.status(201).json(newNotification);
-  } catch (error) {
-    console.error('Errore nella creazione della notifica:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-router.delete('/notifications/:id', async (req, res) => {
-  try {
-    await Notification.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Notifica eliminata con successo' });
-  } catch (error) {
-    console.error('Errore nell\'eliminazione della notifica:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // Ottieni un gruppo specifico
 router.get('/:id', async (req, res) => {
   try {

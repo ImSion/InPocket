@@ -39,7 +39,11 @@ export const createUser = async (userData) => { // creiamo un utente
 }; 
 export const updateUser = async (id, userData) => {
   try {
-    const response = await axiosApi.patch(`/users/${id}`, userData);
+    const response = await axiosApi.patch(`/users/${id}`, userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     console.log("Utente aggiornato:", response.data);
     return response.data;
   } catch (error) {
@@ -47,10 +51,12 @@ export const updateUser = async (id, userData) => {
     throw error;
   }
 };
-export const updateUserAvatar = (id, avatarData) => axiosApi.patch(`/users/${id}/avatar`, avatarData, { // Modifichiamo l'avatar(img) dell'utente
-      headers: {
-          "Content-Type": 'multipart/form-data'
-      }});
+export const updateUserAvatar = (id, avatarData) => 
+  axiosApi.patch(`/users/${id}/avatar`, avatarData, {
+    headers: {
+      "Content-Type": 'multipart/form-data'
+    }
+  });
 export const deleteUser = (id) => axiosApi.delete(`/users/${id}`); // eliminiamo un utente
 
 // CRUD per le transazioni

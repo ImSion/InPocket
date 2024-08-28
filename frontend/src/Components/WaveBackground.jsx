@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
-// Componente principale che accetta isDarkMode come prop
-const WaveBackground = ({ isDarkMode }) => {
+// Componente principale per lo sfondo con onde
+const WaveBackground = () => {
   // Crea un riferimento al canvas
   const canvasRef = useRef(null);
 
@@ -42,17 +42,17 @@ const WaveBackground = ({ isDarkMode }) => {
         ctx.lineTo(0, canvas.height);
         ctx.fillStyle = color;
         ctx.fill();
-      };
+    };
 
     // Funzione di animazione principale
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Sceglie il colore base in base alla modalità scura/chiara
-      const baseColor = isDarkMode ? [60, 20, 90] : [100, 80, 255];
+      // Colore base per le onde
+      const baseColor = [100, 80, 255];
       const time = Date.now() * 0.001;
       
       // Disegna due onde con diversi offset e opacità
-      drawDiagonalWave(time * 0.5, `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, 0.2)`);
+      drawDiagonalWave(time * 0.4, `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, 0.2)`);
       drawDiagonalWave(time * 0.7, `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, 0.3)`);
 
       // Richiede il prossimo frame di animazione
@@ -71,10 +71,21 @@ const WaveBackground = ({ isDarkMode }) => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [isDarkMode]); // Dipendenza: l'effetto si riattiva quando cambia isDarkMode
+  }, []); // Nessuna dipendenza, l'effetto si esegue solo al montaggio del componente
 
   // Renderizza il canvas
-  return <canvas ref={canvasRef} style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1}} />;
+  return <canvas 
+    className='bg-white dark:bg-black'
+    ref={canvasRef} 
+    style={{
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      width: '100%',
+      height: '100%', 
+      zIndex: -1
+    }} 
+  />;
 };
 
 export default WaveBackground;

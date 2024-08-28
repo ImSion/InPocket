@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { updateUser } from "../Modules/ApiCrud";
+import { updateUser, updateUserAvatar  } from "../Modules/ApiCrud";
 
 export default function UserProfile({ userData, updateUserData }) {
   const [editMode, setEditMode] = useState(false);
@@ -11,6 +11,8 @@ export default function UserProfile({ userData, updateUserData }) {
     data_di_nascita: '',
     avatar: ''
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   useEffect(() => {
     if (userData) {
@@ -23,6 +25,7 @@ export default function UserProfile({ userData, updateUserData }) {
           : '',
         avatar: userData.avatar || ''
       });
+      setAvatarPreview(userData.avatar || '');
     }
   }, [userData]);
   
@@ -40,15 +43,40 @@ export default function UserProfile({ userData, updateUserData }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    setAvatarFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const dataToSubmit = {
-        ...formData,
-        data_di_nascita: formatDateForSubmission(formData.data_di_nascita)
-      };
-      const updatedUser = await updateUser(userData._id, dataToSubmit);
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append('nome', formData.nome);
+      formDataToSubmit.append('cognome', formData.cognome);
+      formDataToSubmit.append('email', formData.email);
+      formDataToSubmit.append('data_di_nascita', formatDateForSubmission(formData.data_di_nascita));
+
+      let updatedUser;
+
+      if (avatarFile) {
+        // Se c'è un nuovo avatar, usa la funzione specifica per l'upload dell'avatar
+        const avatarFormData = new FormData();
+        avatarFormData.append('avatar', avatarFile);
+        const avatarResponse = await updateUserAvatar(userData._id, avatarFormData);
+        updatedUser = avatarResponse.data;
+      }
+
+      // Aggiorna gli altri dati dell'utente
+      updatedUser = await updateUser(userData._id, formDataToSubmit);
+
       console.log("Profilo aggiornato:", updatedUser);
       updateUserData(updatedUser);
       setEditMode(false);
@@ -83,8 +111,11 @@ export default function UserProfile({ userData, updateUserData }) {
               <input type="date" name="data_di_nascita" value={formData.data_di_nascita} onChange={handleChange} />
             </div>
             <div>
-              <label>URL Avatar: </label>
-              <input type="text" name="avatar" value={formData.avatar} onChange={handleChange} />
+              <label>Avatar: </label>
+              <input type="file" name="avatar" onChange={handleAvatarChange} accept="image/*" />
+              {avatarPreview && (
+                <img src={avatarPreview} alt="Avatar Preview" style={{width: '100px', height: '100px', marginTop: '10px'}} />
+              )}
             </div>
             <button type="submit">Salva modifiche</button>
             <button type="button" onClick={() => setEditMode(false)}>Annulla</button>

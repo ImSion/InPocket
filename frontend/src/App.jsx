@@ -17,21 +17,6 @@ import { Flowbite } from 'flowbite-react';
 function App() {
   const { isLoading } = useAuth0();
   const { userData, updateUserData } = useUserData();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode');
-    setIsDarkMode(savedMode === 'true');
-  }, []);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', isDarkMode);
-  }, [isDarkMode]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -40,14 +25,12 @@ function App() {
   return (
     <Flowbite>
       <div className="relative min-h-screen">
-        <WaveBackground isDarkMode={isDarkMode} />
+        <WaveBackground />
         <div className="relative z-10">
           <NotificationProvider>
             <Router>
               <Nav 
                 userData={userData} 
-                isDarkMode={isDarkMode} 
-                setIsDarkMode={setIsDarkMode}
               />
               <main className="container mx-auto px-4 py-8">
                 <Routes>
