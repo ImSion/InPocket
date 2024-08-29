@@ -87,29 +87,41 @@ export default function UserProfile({ userData, updateUserData }) {
 
   return (
       <div className='min-h-screen pt-20'>
-        <h1 className='text-center mb-3'>Profilo Utente</h1>
+        <h1 className='text-center mb-3 dark:text-white'>Profilo Utente</h1>
         {editMode ? (
           <form className='flex flex-col justify-center items-center gap-2' onSubmit={handleSubmit}>
 
-            <div className='flex gap-2'>
+            {/* Nome e Cognome */}
+            <div className='flex flex-col sm:flex-row gap-2'>
+
               <div className='flex flex-col items-center'>
                 <label>Nome</label>
                 <input type="text" name="nome" value={formData.nome} onChange={handleChange} />
               </div>
+
               <div className='flex flex-col items-center'>
                 <label>Cognome </label>
                 <input type="text" name="cognome" value={formData.cognome} onChange={handleChange} />
               </div>
+
+            </div>
+            
+            {/* Email e data di nascita */}
+            <div className='flex flex-col sm:flex-row items-center gap-4'>
+
+              <div className='flex flex-col text-center'>
+                <label>Email: </label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} />
+              </div>
+              
+              <div className='flex flex-col text-center'>
+                <label>Data di nascita: </label>
+                <input type="date" name="data_di_nascita" value={formData.data_di_nascita} onChange={handleChange} />
+              </div>
+
             </div>
 
-            <div className='flex flex-col items-center'>
-              <label>Email: </label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} />
-            </div>
-            <div>
-              <label>Data di nascita: </label>
-              <input type="date" name="data_di_nascita" value={formData.data_di_nascita} onChange={handleChange} />
-            </div>
+            {/* Avatar (img profilo) */}
             <div>
               <label>Avatar: </label>
               <input type="file" name="avatar" onChange={handleAvatarChange} accept="image/*" />
@@ -121,12 +133,14 @@ export default function UserProfile({ userData, updateUserData }) {
             <button type="button" onClick={() => setEditMode(false)}>Annulla</button>
           </form>
         ) : (
-          <div className='flex flex-col justify-center items-center gap-2'>
-            <p>Nome: {formData.nome}</p>
-            <p>Cognome: {formData.cognome}</p>
+          <div className='flex flex-col justify-center items-center gap-2 dark:text-white'>
+            <img src={formData.avatar} alt="Avatar" className='w-[99%] h-72 sm:w-80' />
+            <div className='flex gap-4'>
+              <p>Nome: {formData.nome}</p>
+              <p>Cognome: {formData.cognome}</p>
+            </div>
             <p>Email: {formData.email}</p>
             <p>Data di nascita: {formData.data_di_nascita}</p>
-            <img src={formData.avatar} alt="Avatar" style={{width: '100px', height: '100px'}} />
             <button onClick={() => setEditMode(true)}>Modifica profilo</button>
           </div>
         )}

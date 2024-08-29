@@ -10,26 +10,18 @@ export default function Login() {
     loginWithRedirect();
   };
 
-  const handleRegister = () => {
-    window.location.href = "https://dev-obl7w1lr6ozyat2c.us.auth0.com/u/signup?state=hKFo2SB2Q1ZmMmRxUEFHSXlJenNNaVR3dUFSZFVRdm1CeFNTYqFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIFJjMVp5X0JnbGJxQWVkcGZCU3RsWEhxMWZ6ZHY2M2FXo2NpZNkgTUxySTBabEtHdWY0ZDBxcjNJMUVNYk04THB2NmprdUw";
-  };
-
   return (
     <div className="flex flex-col min-h-screen items-center justify-center dark:text-white">
-      <h1 className="text-3xl mb-10 font-bold">Benvenuto in</h1>
 
-      <div className="flex mb-10">
-        <span className="self-center whitespace-nowrap text-4xl font-semibold dark:text-white">In</span>
-        <img src={logo} className="h-10 sm:h-40" alt="Logo InPocket" />
-        <span className="self-center whitespace-nowrap text-4xl font-semibold dark:text-white">ocket</span>
+      <div className="mb-10">   
+        <img src={logo} className="h-40" alt="Logo InPocket" />
       </div>
 
-      <div className="flex items-center space-x-4">
-        <Button size="lg" onClick={handleLogin} className="bg-blue-600 hover:bg-blue-700">
-          Login
-        </Button>
-        <Button size="lg" onClick={handleRegister} className="bg-green-600 hover:bg-green-700">
-          Registrati
+      <h1 className="text-3xl mb-10 font-bold text-center">Benvenuto in InPocket</h1>
+
+      <div className="flex items-center space-x-4 border-4 rounded-lg border-[#f7cc69]">
+        <Button size="lg" onClick={handleLogin} className="bg-gradient-to-r from-[#3a5e68] to-[#0d447b] hover:from-blue-700 hover:to-green-600 text-white font-bold py-2 px-4 rounded">
+          Effettua il Login o Registrati
         </Button>
       </div>
     </div>
