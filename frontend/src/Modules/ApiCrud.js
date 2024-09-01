@@ -2,7 +2,7 @@ import axiosApi from "./Axios";
 
 // CRUD per gli utenti
 
-export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli autori
+export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli utenti
 export const getUser = (id) => axiosApi.get(`/users/${id}`); // riceviamo un singolo utente
 export const getUserByAuth0Id = async (auth0Id) => {
   try {
@@ -67,7 +67,7 @@ export const getUserTransactions = (userId) => axiosApi.get(`/transactions/user/
 export const createTransaction = async (userId, transactionData) => {
   try {
     console.log("Dati transazione da inviare:", { ...transactionData, user: userId });
-    const response = await axiosApi.post("/transactions", { // Cambiato da "/transaction" a "/transactions"
+    const response = await axiosApi.post("/transactions", { 
       ...transactionData,
       user: userId,
       categoria: transactionData.categoria || '',

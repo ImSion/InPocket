@@ -165,7 +165,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       <h2 className="text-xl font-semibold mb-2">Gruppo: {group.name}</h2>
       <p>{group.description}</p>
 
-      <div className='flex'>
+      <div className='flex justify-center'>
         <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4 h-10 flex justify-center items-center p-2 py-5">
           Invita Utente
         </Button>

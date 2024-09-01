@@ -71,8 +71,8 @@ export default function Transactions({ show, onClose, onSubmit, transaction: ini
 
   return (
     <Modal show={show} onClose={onClose}>
-      <Modal.Header>{initialTransaction ? 'Modifica Transazione' : 'Aggiungi Transazione'}</Modal.Header>
-      <Modal.Body>
+      <Modal.Header className='dark:bg-sky-950'>{initialTransaction ? 'Modifica Transazione' : 'Aggiungi Transazione'}</Modal.Header>
+      <Modal.Body className='dark:bg-sky-950'>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Campo per selezionare il tipo di transazione */}
           <div>

@@ -1,3 +1,102 @@
-.text {
-    color: #00ffff;
-}
+/* MainCSS.css */
+
+/* Animazione per la dissolvenza in entrata */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 1.5s ease-in;
+  }
+  
+  /* Animazione per l'effetto macchina da scrivere */
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  
+  @keyframes blinkCursor {
+    from { border-right-color: rgba(255,255,255,.75); }
+    to { border-right-color: transparent; }
+  }
+  
+  .typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: .15em;
+    animation: 
+      typewriter 3.0s steps(40, end),
+      blinkCursor .75s step-end infinite;
+  }
+  
+  /* Animazione per la transizione da sinistra a destra */
+  @keyframes slideInFromLeft {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .slide-in-left {
+    animation: slideInFromLeft 1s ease-out;
+  }
+  
+  /* Shake */
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(5px); }
+    50% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+  }
+  
+  .shake {
+    animation: shake 0.8s ease-in-out;
+  }
+  
+  @keyframes fadeInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .fade-in-left {
+    animation: fadeInFromLeft 1.5s ease-out forwards;
+  }
+  
+  .fade-in-right {
+    animation: fadeInFromRight 1.5s ease-out forwards;
+  }
+
+  .shdw {
+    box-shadow: 0px 0px 5px green;
+  }
+  .shdw-red {
+    box-shadow: 0px 0px 5px red;
+  }
+
+  .shdw-btn {
+    box-shadow: 0px 0px 10px rgb(0, 195, 255);
+  }

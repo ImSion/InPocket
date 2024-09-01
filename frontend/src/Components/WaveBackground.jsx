@@ -48,7 +48,7 @@ const WaveBackground = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Colore base per le onde
-      const baseColor = [100, 80, 255];
+      const baseColor = [11, 101, 204];
       const time = Date.now() * 0.001;
       
       // Disegna due onde con diversi offset e opacità

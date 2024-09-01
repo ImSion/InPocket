@@ -16,9 +16,9 @@ const InvitesList = ({ invites, onAccept, onReject }) => {
 
   return (
     <div className="mt-4">
-      <h2 className="text-xl font-bold mb-2">Inviti ai Gruppi</h2>
+      <h2 className="text-xl font-bold mb-2 dark:text-white">Inviti ai Gruppi</h2>
       {invites.length === 0 ? (
-        <p>Nessun invito pendente.</p>
+        <p className='dark:text-white'>Nessun invito pendente.</p>
       ) : (
         <ul>
           {invites.map(invite => (

@@ -29,12 +29,12 @@ InPocket/
     │   ├── components/
     │   │   ├── AuthWrapper.jsx
     │   │   ├── Calendar.jsx
-    │   │   ├── LoginButton.jsx
-    │   │   ├── LogoutButton.jsx
     │   │   ├── MyFooter.jsx
     │   │   ├── Nav.jsx
     │   │   ├── Notifications.jsx
     │   │   └── Transactions.jsx
+    │   │   
+    │   │   
     │   ├── Contexts/
     │   │   └── NotificationContext.jsx
     │   ├── Hooks/

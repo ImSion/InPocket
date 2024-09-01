@@ -32,7 +32,7 @@ function App() {
               <Nav 
                 userData={userData} 
               />
-              <main className="container mx-auto px-4 py-8">
+              <main className="px-2 sm:px-5 py-8">
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   <Route element={<AuthWrapper />}>

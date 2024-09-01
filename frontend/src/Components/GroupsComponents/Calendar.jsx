@@ -71,6 +71,7 @@ export default function Calendar({ tasks, onSelectDate }) {
         messages={messages}
         formats={formats}
         culture='it'
+        className='dark:text-white'
       />
     </div>
   );

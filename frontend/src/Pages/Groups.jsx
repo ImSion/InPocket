@@ -74,32 +74,37 @@ export default function Groups({ userData }) {
 
   return (
     <div className=" mx-auto p-4 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">I tuoi Gruppi</h1>
-      <button 
-        onClick={() => setShowCreateForm(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-      >
-        Crea Nuovo Gruppo
-      </button>
-      {showCreateForm && (
-        <CreateGroupForm 
-          onSubmit={handleCreateGroup} 
-          onCancel={() => setShowCreateForm(false)}
-        />
-      )}
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/3 mb-4 md:mb-0 md:mr-4">
-          <GroupList 
-            groups={groups} 
-            onSelectGroup={setSelectedGroup}
-          />
+      <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
+      <div className='flex justify-between'>
+        <div className='flex flex-col'>
+          <button onClick={() => setShowCreateForm(true)} className="bg-cyan-500 h-10 text-white px-4 py-2 rounded mb-4">
+            Crea Nuovo Gruppo
+          </button>
+
           <InvitesList 
             invites={invites}
             onAccept={handleAcceptInvite}
             onReject={handleRejectInvite}
           />
         </div>
-        <div className="w-full md:w-2/3">
+        
+        
+        <GroupList 
+          groups={groups} 
+          onSelectGroup={setSelectedGroup}
+        />
+
+
+      </div>
+      
+      {showCreateForm && (
+        <CreateGroupForm 
+          onSubmit={handleCreateGroup} 
+          onCancel={() => setShowCreateForm(false)}
+        />
+      )}
+      <div className="flex flex-col">
+        <div className="w-full">
         {selectedGroup && (
           <GroupDetail 
             group={selectedGroup} 
