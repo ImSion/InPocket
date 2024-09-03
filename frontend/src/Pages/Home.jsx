@@ -1,33 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
-import { Button, Card, Modal, Dropdown } from 'flowbite-react';
-import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';
-import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';import Transactions from '../Components/Transactions'
-import '../Style/MainCSS.css'
+import React, { useState, useEffect } from 'react';  // Importa React e gli hooks necessari
+import { useAuth0 } from "@auth0/auth0-react";  // Importa hook per Auth0
+import { Button, Card, Modal, Dropdown } from 'flowbite-react';  // Importa componenti UI da Flowbite
+import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';  // Importa componenti per i grafici
+import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';  // Importa funzioni API
+import Transactions from '../Components/Transactions'  // Importa componente Transactions
+import '../Style/MainCSS.css'  // Importa stili CSS
 
-// Modifichiamo la firma della funzione per accettare userData come prop
+// Definizione del componente Home che accetta userData come prop
 export default function Home({ userData: propUserData }) {
-  // Utilizziamo useAuth0 per ottenere informazioni sull'autenticazione dell'utente
+  // Utilizza useAuth0 per ottenere informazioni sull'autenticazione dell'utente
   const { isAuthenticated, user } = useAuth0();
   
-  // Stati per gestire i dati dell'utente, le transazioni e il modale
-  // Inizializziamo userData con propUserData
-  const [userData, setUserData] = useState(propUserData);
-  const [transactions, setTransactions] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [currentTransaction, setCurrentTransaction] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [transactionToDelete, setTransactionToDelete] = useState(null);
-  const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+  // Stati per gestire i dati dell'utente, le transazioni e i modali
+  const [userData, setUserData] = useState(propUserData);  // Stato per i dati utente
+  const [transactions, setTransactions] = useState([]);  // Stato per le transazioni
+  const [showModal, setShowModal] = useState(false);  // Stato per mostrare/nascondere il modale
+  const [currentTransaction, setCurrentTransaction] = useState(null);  // Stato per la transazione corrente
+  const [showDeleteModal, setShowDeleteModal] = useState(false);  // Stato per il modale di eliminazione
+  const [transactionToDelete, setTransactionToDelete] = useState(null);  // Stato per la transazione da eliminare
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null);  // Stato per la transazione selezionata
   
-
   // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
     setUserData(propUserData);
   }, [propUserData]);
 
   // Effetto per recuperare i dati dell'utente quando l'autenticazione cambia
-  // Manteniamo questo effetto come fallback nel caso in cui propUserData non sia disponibile
   useEffect(() => {
     if (isAuthenticated && user && !userData) {
       fetchUserData();
@@ -42,7 +40,6 @@ export default function Home({ userData: propUserData }) {
   }, [userData]);
 
   // Funzione per recuperare i dati dell'utente dal backend
-  // Manteniamo questa funzione come fallback
   const fetchUserData = async () => {
     try {
       let data;
@@ -51,7 +48,7 @@ export default function Home({ userData: propUserData }) {
         data = await getUserByAuth0Id(user.sub);
       }
       if (!data && user.email) {
-        // Se non trova con Auth0 ID e l'email è disponibile, prova con l'email
+        // Se non trova con Auth0 ID, prova con l'email
         data = await getUserByEmail(user.email);
       }
       if (data) {
@@ -118,6 +115,7 @@ export default function Home({ userData: propUserData }) {
     });
   };
 
+  // Componente per la legenda personalizzata del grafico a torta
   const CustomPieLegend = ({ data, title }) => (
     <>
       {/* Versione mobile (dropdown) */}
@@ -154,6 +152,7 @@ export default function Home({ userData: propUserData }) {
     </>
   );
 
+  // Componente per il grafico a torta delle spese
   const PieExpensesGraphic = ({ data }) => {
     const { 
       pieDataAnnuale, 
@@ -236,6 +235,7 @@ export default function Home({ userData: propUserData }) {
     );
   };
 
+  // Funzione per preparare i dati finanziari per i grafici a torta
   const pieFinancialData = () => {
     let totalEntrateAnnuali = 0;
     let totalUsciteAnnuali = 0;
@@ -312,8 +312,7 @@ export default function Home({ userData: propUserData }) {
     };
   };
 
-
-  // Funzione per preparare i dati per il grafico
+  // Funzione per preparare i dati per il grafico a linee
   const prepareChartData = () => {
     const data = {};
     transactions.forEach(t => {
@@ -332,59 +331,54 @@ export default function Home({ userData: propUserData }) {
 
   const { categoryColorMap } = pieFinancialData();
 
-    const barChartData = Object.entries(transactions.reduce((acc, t) => {
+  // Prepara i dati per il grafico a barre delle uscite per categoria
+  const barChartData = Object.entries(transactions.reduce((acc, t) => {
+    if (t.tipo === 'uscita') {
+      acc[t.categoria] = (acc[t.categoria] || 0) + parseFloat(t.importo);
+    }
+    return acc;
+  }, {})).map(([name, value]) => ({ 
+    name, 
+    value,
+    fill: categoryColorMap[name] || '#000000'
+  }));
+
+  // Funzione per ottenere il numero di occorrenze annuali di una transazione ricorrente
+  const getYearlyOccurrences = (transaction) => {
+    switch (transaction.frequenzaRicorrenza) {
+      case 'Giornaliera': return 365;
+      case 'Settimanale': return 52;
+      case 'Mensile': return 12;
+      case 'Annuale': return 1;
+      default: return 1;
+    }
+  };
+    
+  // Funzione per ottenere le top categorie di spesa
+  const getTopExpenseCategories = () => {
+    let totalAnnualExpenses = 0;
+    const categoryExpenses = transactions.reduce((acc, t) => {
       if (t.tipo === 'uscita') {
-        acc[t.categoria] = (acc[t.categoria] || 0) + parseFloat(t.importo);
+        const importo = parseFloat(t.importo);
+        if (!acc[t.categoria]) {
+          acc[t.categoria] = {
+            importo: 0,
+            color: categoryColorMap[t.categoria] || '#000000'
+          };
+        }
+        acc[t.categoria].importo += importo;
+        totalAnnualExpenses += importo;
       }
       return acc;
-    }, {})).map(([name, value]) => ({ 
-      name, 
-      value,
-      fill: categoryColorMap[name] || '#000000'
-    }));
-
-    const getYearlyOccurrences = (transaction) => { //questa costante potrebbe essere utilizzata in futuro per analisi finanziarie più complesse.
-      switch (transaction.frequenzaRicorrenza) {
-        case 'Giornaliera':
-          return 365;
-        case 'Settimanale':
-          return 52;
-        case 'Mensile':
-          return 12;
-        case 'Annuale':
-          return 1;
-        default:
-          return 1;
-      }
+    }, {});
+  
+    return {
+      categories: Object.entries(categoryExpenses)
+        .sort((a, b) => b[1].importo - a[1].importo)
+        .slice(0, 5),
+      totalAnnualExpenses
     };
-    
-    const getTopExpenseCategories = () => {
-      let totalAnnualExpenses = 0;
-      const categoryExpenses = transactions.reduce((acc, t) => {
-        if (t.tipo === 'uscita') {
-          // Consideriamo tutte le transazioni, incluse quelle generate
-          const importo = parseFloat(t.importo);
-          if (!acc[t.categoria]) {
-            acc[t.categoria] = {
-              importo: 0,
-              color: categoryColorMap[t.categoria] || '#000000'
-            };
-          }
-          acc[t.categoria].importo += importo;
-          totalAnnualExpenses += importo;
-        }
-        return acc;
-      }, {});
-    
-      return {
-        categories: Object.entries(categoryExpenses)
-          .sort((a, b) => b[1].importo - a[1].importo)
-          .slice(0, 5),
-        totalAnnualExpenses
-      };
-    };
-
-    
+  };
 
   // Preparazione dei dati per il grafico
   const chartData = prepareChartData();
@@ -426,6 +420,7 @@ export default function Home({ userData: propUserData }) {
     setShowDeleteModal(true);
   };
   
+  // Funzione per confermare l'eliminazione di una transazione
   const confirmDeleteTransaction = async () => {
     try {
       await deleteTransaction(userData._id, transactionToDelete);
@@ -437,23 +432,27 @@ export default function Home({ userData: propUserData }) {
     }
   };
 
-
   // Rendering del componente
   return (
     <div className='xl:flex xl:flex-col xl:items-center'>
+      {/* Header con benvenuto e titolo dashboard */}
       <div className='flex justify-between xl:w-[1000px]'>
-        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake">Bentornato, {userData?.nome || user.name}</h1>
-        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg shake">Dashboard</h1>
+        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake">
+          Bentornato, {userData?.nome || user.name}
+        </h1>
+        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg shake">
+          Dashboard
+        </h1>
       </div>
       
       {/* Sezione dei grafici */}
-
       {/* Grafico a torta */}
-      <div className='w-full xl:w-[1000px] fade-in flex flex-col items-center justify-center mb-4 border-2 rounded-lg dark:border-cyan-500 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90' >
+      <div className='w-full xl:w-[1000px] fade-in flex flex-col items-center justify-center mb-4 border-2 rounded-lg dark:border-cyan-500 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
         <h2 className="text-xl font-semibold mb-2 mt-2 dark:text-white">Ripartizione Finanziaria</h2>
         <PieExpensesGraphic data={pieFinancialData()}/>
+        {/* Riepilogo entrate e uscite */}
         <div className="mt-4 mb-2 flex justify-between w-full px-5 items-center text-center">
-          {/* entrate */}
+          {/* Entrate */}
           <div>
             <div>
               <span className="font-bold text-green-500">Entrate annuali: </span>
@@ -464,7 +463,7 @@ export default function Home({ userData: propUserData }) {
               <span className="dark:text-white">€{pieFinancialData().totalEntrateMensili?.toFixed(2) || '0.00'}</span>
             </div>
           </div>
-          {/* uscite */}
+          {/* Uscite */}
           <div>
             <div>
               <span className="font-bold text-red-500">Uscite annuali: </span>
@@ -478,6 +477,7 @@ export default function Home({ userData: propUserData }) {
         </div>
       </div>
 
+      {/* Grafici a linee e a barre */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Grafico Entrate/Uscite */}
         <div className='flex-col xl:w-[494px] dark:shadow-cyan-800 dark:border-cyan-500 fade-in-left h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
@@ -506,23 +506,17 @@ export default function Home({ userData: propUserData }) {
               <Tooltip />
               <Legend />
               <Bar fill='' dataKey="value" name="Importo">
-                {
-                  barChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))
-                }
+                {barChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
-
-      
-      
       
       {/* Lista delle transazioni recenti */}
       <div className='flex relative dark:shadow-cyan-800 border-2 dark:border-cyan-500 flex-col xl:w-[1000px] justify-center p-1 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
-
         {/* Pulsante per aggiungere una nuova transazione */}
         <div className="absolute top-3 left-3">
           <button onClick={() => handleOpenModal()} className='border-2 border-x-sky-600 border-y-emerald-600 rounded-lg'>
@@ -534,6 +528,7 @@ export default function Home({ userData: propUserData }) {
 
         <h2 className="text-xl font-semibold mb-6 mt-4 dark:text-white text-center">Transazioni Recenti</h2>
         <div className="sm:flex sm:gap-4 border-t-2 border-black dark:border-cyan-500">
+          {/* Lista delle prime 10 transazioni */}
           <ul className="w-full sm:w-1/2 mt-3">
           {transactions.slice(0, 10).map((transaction) => (
             <li 
@@ -553,6 +548,7 @@ export default function Home({ userData: propUserData }) {
             </div>
             {selectedTransactionId === transaction._id && (
               <div className='flex gap-1 transition-opacity duration-300'>
+                {/* Pulsante modifica */}
                 <button 
                   size="sm" 
                   onClick={(e) => {
@@ -565,6 +561,7 @@ export default function Home({ userData: propUserData }) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                   </svg>
                 </button>
+                {/* Pulsante elimina */}
                 <button 
                   size="sm" 
                   onClick={(e) => {
@@ -582,58 +579,60 @@ export default function Home({ userData: propUserData }) {
             </li>
           ))}
           </ul>
+          {/* Lista delle successive 10 transazioni (visibile solo su schermi più grandi) */}
           <ul className="w-full sm:w-1/2 hidden sm:block mt-3">
-          {transactions.slice(10, 20).map((transaction) => (
-            <li 
-              key={transaction._id} 
-              className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-colors duration-300 ${
-                selectedTransactionId === transaction._id ? 'bg-blue-100 dark:bg-blue-900' : ''
-              }`}
-              onClick={() => setSelectedTransactionId(
-                selectedTransactionId === transaction._id ? null : transaction._id
-              )}
-            >
-            <div>
-              <span>{transaction.descrizione} - {transaction.importo} €</span>
-              <span className="ml-2 text-sm text-gray-500">
-                {new Date(transaction.data).toLocaleDateString()}
-              </span>
-            </div>
-            {selectedTransactionId === transaction._id && (
-              <div className='flex gap-1 transition-opacity duration-300'>
-                <button 
-                  size="sm" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenModal(transaction);
-                  }} 
-                  className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-800 border border-emerald-600 hover:bg-emerald-900 dark:hover:bg-green-900 shdw"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-emerald-600">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                  </svg>
-                </button>
-                <button 
-                  size="sm" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteTransaction(transaction._id);
-                  }} 
-                  className='w-8 h-7 flex rounded-lg shdw-red items-center justify-center bg-transparent dark:bg-gray-800 border border-red-600 hover:bg-red-900 dark:hover:bg-orange-950'
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-red-600">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                  </svg>
-                </button>
-              </div>
-              )}
-            </li>
-          ))}
+            {transactions.slice(10, 20).map((transaction) => (
+              <li 
+                key={transaction._id} 
+                className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-colors duration-300 ${
+                  selectedTransactionId === transaction._id ? 'bg-blue-100 dark:bg-blue-900' : ''
+                }`}
+                onClick={() => setSelectedTransactionId(
+                  selectedTransactionId === transaction._id ? null : transaction._id
+                )}
+              >
+                <div>
+                  <span>{transaction.descrizione} - {transaction.importo} €</span>
+                  <span className="ml-2 text-sm text-gray-500">
+                    {new Date(transaction.data).toLocaleDateString()}
+                  </span>
+                </div>
+                {selectedTransactionId === transaction._id && (
+                  <div className='flex gap-1 transition-opacity duration-300'>
+                    {/* Pulsante modifica */}
+                    <button 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenModal(transaction);
+                      }} 
+                      className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-800 border border-emerald-600 hover:bg-emerald-900 dark:hover:bg-green-900 shdw"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-emerald-600">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                      </svg>
+                    </button>
+                    {/* Pulsante elimina */}
+                    <button 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteTransaction(transaction._id);
+                      }} 
+                      className='w-8 h-7 flex rounded-lg shdw-red items-center justify-center bg-transparent dark:bg-gray-800 border border-red-600 hover:bg-red-900 dark:hover:bg-orange-950'
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-red-600">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      
       {/* Top Categorie di Spesa */}
       <Card className="mt-4 dark:border-cyan-500 border-2 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
         <h2 className="text-xl font-semibold mb-2 dark:text-white">In cosa spendi di più (Annuale)</h2>
@@ -673,7 +672,6 @@ export default function Home({ userData: propUserData }) {
         })()}
       </Card>
       
-
       {/* Modale per aggiungere/modificare transazioni */}
       {userData && (
         <Transactions 

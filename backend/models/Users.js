@@ -1,103 +1,101 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt'
+import mongoose from 'mongoose'; 
+import bcrypt from 'bcrypt'  // Importa bcrypt per l'hashing delle password
 
 const usersSchema = new mongoose.Schema(
     {
       nome: {
-        type: String,
-        trim: true //rimuove gli spazi all'inizio e alla fine della stringa
+        type: String,  // Il nome è una stringa
+        trim: true  // Rimuove gli spazi all'inizio e alla fine della stringa
       },
       cognome: {
-        type: String,
-        trim: true 
+        type: String,  // Il cognome è una stringa
+        trim: true  
       },
       email: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: function() { return !this.email.endsWith('@example.com'); }
+        type: String,  // L'email è una stringa
+        required: true,  // Campo obbligatorio
+        trim: true,  
+        unique: function() { return !this.email.endsWith('@example.com'); }  // Email unica se non termina con @example.com
       },
       data_di_nascita: {
-        type: Date,
-        trim: true,
+        type: Date,  // La data di nascita è di tipo Date
+        trim: true,  // Rimuove gli spazi (anche se non ha effetto su Date)
       },
       dataRegistrazione: {
-        type: Date,
-        default: Date.now
+        type: Date,  // La data di registrazione è di tipo Date
+        default: Date.now  // Valore predefinito: data corrente
       },
-      impostazioni: { // campo per le impostazioni dell'utente
+      impostazioni: {  // Oggetto per le impostazioni dell'utente
         valuta: {
-          type: String,
-          default: 'EUR'
+          type: String,  // La valuta è una stringa
+          default: 'EUR'  // Valore predefinito: EUR
         },
         temaInterfaccia: {
-          type: String,
-          default: 'light'
+          type: String,  // Il tema dell'interfaccia è una stringa
+          default: 'light'  // Valore predefinito: light
         }
       },
       avatar: {
-        type: String,
-        trim: true,
-        default: "https://www.shutterstock.com/image-vector/default-avatar-profile-vector-user-260nw-1705357234.jpg"
+        type: String,  // L'URL dell'avatar è una stringa
+        trim: true,  // Rimuove gli spazi all'inizio e alla fine della stringa
+        default: "https://www.shutterstock.com/image-vector/default-avatar-profile-vector-user-260nw-1705357234.jpg"  // Avatar predefinito
       },
       password: {
-        type: String,
+        type: String,  // La password (hashata) è una stringa
       },
       isProfileComplete: {
-        type: Boolean,
-        default: false
+        type: Boolean,  // Flag per indicare se il profilo è completo
+        default: false  // Valore predefinito: false
       },
-      
-      identities: [{
-        provider: String,
-        user_id: String
+      identities: [{  // Array di identità per autenticazione esterna
+        provider: String,  // Provider di autenticazione
+        user_id: String  // ID utente del provider
       }],
-      groups: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group'
+      groups: [{  // Array di gruppi a cui l'utente appartiene
+        type: mongoose.Schema.Types.ObjectId,  // Riferimento all'ID del gruppo
+        ref: 'Group'  // Riferimento al modello Group
       }],
-      groupInvites: [{
+      groupInvites: [{  // Array di inviti ai gruppi
         group: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Group'
+          type: mongoose.Schema.Types.ObjectId,  // Riferimento all'ID del gruppo
+          ref: 'Group'  // Riferimento al modello Group
         },
         invitedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'users'
+          type: mongoose.Schema.Types.ObjectId,  // Riferimento all'ID dell'utente che ha inviato l'invito
+          ref: 'users'  // Riferimento al modello users
         },
         createdAt: {
-          type: Date,
-          default: Date.now
+          type: Date,  // Data di creazione dell'invito
+          default: Date.now  // Valore predefinito: data corrente
         }
       }]
     },
     {
-       collection: 'users',
-       timestamps: true 
+       collection: 'users',  // Nome della collezione in MongoDB
+       timestamps: true  // Aggiunge automaticamente i campi createdAt e updatedAt
     }
 )
 
-// Funzione che confronta la password
+// Metodo per confrontare la password fornita con quella hashata nel database
 usersSchema.methods.comparePassword = function(candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password)
+  return bcrypt.compare(candidatePassword, this.password)  // Utilizza bcrypt per confrontare le password
 };
 
+// Middleware pre-save per l'hashing della password
 usersSchema.pre('save', async function(next) {
-
-  // Eseguo l'hashing solo se la password è stata modificata
-  // oppure è una nuova password
+  // Esegue l'hashing solo se la password è stata modificata o è nuova
   if(!this.isModified('password') || !this.password) return next()
 
     try {
-      // Genero un valore casuale con 10 round di hashing
+      // Genera un salt con 10 round di hashing
       const salt = await bcrypt.genSalt(10);
-      // E poi salvo
+      // Hasha la password con il salt generato
       this.password = await bcrypt.hash(this.password, salt)
       next();
     } catch(error) {
-      // Se si verifica un errore, passo l'errore
+      // Se si verifica un errore, passa l'errore al middleware successivo
       next(error)
     }
 })
 
-export default mongoose.model('users', usersSchema)
+export default mongoose.model('users', usersSchema)  // Crea e esporta il modello 'users' basato sullo schema definito

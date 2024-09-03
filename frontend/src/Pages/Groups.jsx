@@ -1,25 +1,27 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';
-import GroupList from '../Components/GroupsComponents/GroupList';
-import GroupDetail from '../Components/GroupsComponents/GroupDetail';
-import CreateGroupForm from '../Components/GroupsComponents/CreateGroup';
-import InvitesList from '../Components/GroupsComponents/InvitesList';
-import { NotificationContext, NotificationProvider } from '../Contexts/NotificationContext';
+import React, { useState, useEffect, useContext } from 'react';  // Importa React e hooks necessari
+import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';  // Importa funzioni API
+import GroupList from '../Components/GroupsComponents/GroupList';  // Importa componente per la lista dei gruppi
+import GroupDetail from '../Components/GroupsComponents/GroupDetail';  // Importa componente per i dettagli del gruppo
+import CreateGroupForm from '../Components/GroupsComponents/CreateGroup';  // Importa componente per creare un nuovo gruppo
+import InvitesList from '../Components/GroupsComponents/InvitesList';  // Importa componente per la lista degli inviti
+import { NotificationContext, NotificationProvider } from '../Contexts/NotificationContext';  // Importa contesto per le notifiche
 
 export default function Groups({ userData }) {
+  // Stati per gestire gruppi, inviti, gruppo selezionato e form di creazione
   const [groups, setGroups] = useState([]);
   const [invites, setInvites] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const { addNotification, showAlert } = useContext(NotificationContext);
+  const { addNotification, showAlert } = useContext(NotificationContext);  // Usa il contesto delle notifiche
 
+  // Effetto per caricare i gruppi e gli inviti dell'utente
   useEffect(() => {
     if (userData) {
       fetchUserGroupsAndInvites();
     }
   }, [userData]);
 
-
+  // Funzione per recuperare i gruppi e gli inviti dell'utente
   const fetchUserGroupsAndInvites = async () => {
     try {
       const response = await getUserGroupsAndInvites(userData._id);
@@ -30,6 +32,7 @@ export default function Groups({ userData }) {
     }
   };
 
+  // Funzione per creare un nuovo gruppo
   const handleCreateGroup = async (groupData) => {
     try {
       await createGroup({ ...groupData, creatorId: userData._id });
@@ -40,6 +43,7 @@ export default function Groups({ userData }) {
     }
   };
 
+  // Funzione per accettare un invito a un gruppo
   const handleAcceptInvite = async (inviteId) => {
     try {
       await acceptGroupInvite(inviteId);
@@ -51,6 +55,7 @@ export default function Groups({ userData }) {
     }
   };
 
+  // Funzione per eliminare un gruppo
   const handleDeleteGroup = async (groupId) => {
     try {
       await deleteGroup(groupId);
@@ -61,6 +66,7 @@ export default function Groups({ userData }) {
     }
   };
 
+  // Funzione per rifiutare un invito a un gruppo
   const handleRejectInvite = async (inviteId) => {
     try {
       await rejectGroupInvite(inviteId);
@@ -72,15 +78,18 @@ export default function Groups({ userData }) {
     }
   };
 
+  // Rendering del componente
   return (
     <div className=" mx-auto p-4 min-h-screen">
       <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
       <div className='flex justify-between'>
         <div className='flex flex-col'>
+          {/* Pulsante per creare un nuovo gruppo */}
           <button onClick={() => setShowCreateForm(true)} className="bg-cyan-500 h-10 text-white px-4 py-2 rounded mb-4">
             Crea Nuovo Gruppo
           </button>
 
+          {/* Lista degli inviti */}
           <InvitesList 
             invites={invites}
             onAccept={handleAcceptInvite}
@@ -88,15 +97,14 @@ export default function Groups({ userData }) {
           />
         </div>
         
-        
+        {/* Lista dei gruppi */}
         <GroupList 
           groups={groups} 
           onSelectGroup={setSelectedGroup}
         />
-
-
       </div>
       
+      {/* Form per creare un nuovo gruppo */}
       {showCreateForm && (
         <CreateGroupForm 
           onSubmit={handleCreateGroup} 
@@ -105,6 +113,7 @@ export default function Groups({ userData }) {
       )}
       <div className="flex flex-col">
         <div className="w-full">
+        {/* Dettagli del gruppo selezionato */}
         {selectedGroup && (
           <GroupDetail 
             group={selectedGroup} 

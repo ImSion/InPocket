@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth0 } from "@auth0/auth0-react";
-import { updateUser, registerUser, getUserByAuth0Id } from "../Modules/ApiCrud";
+import React, { useState, useEffect } from 'react';  // Importa React e gli hooks necessari
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate per la navigazione programmatica
+import { useAuth0 } from "@auth0/auth0-react";  // Importa hook per Auth0
+import { updateUser, registerUser, getUserByAuth0Id } from "../Modules/ApiCrud";  // Importa funzioni API
 
 export default function Register({ updateUserData }) {
+  // Stato per i dati del form
   const [formData, setFormData] = useState({
     nome: '',
     cognome: '',
     email: '',
     data_di_nascita: '',
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const { user } = useAuth0();
+  const [isLoading, setIsLoading] = useState(true);  // Stato per gestire il caricamento
+  const navigate = useNavigate();  // Hook per la navigazione
+  const { user } = useAuth0();  // Ottiene i dati dell'utente da Auth0
 
   useEffect(() => {
     const fetchUserData = async () => {
-      setIsLoading(true);
+      setIsLoading(true);  // Inizia il caricamento
       try {
+        // Tenta di ottenere i dati dell'utente dal database
         let dbUser = await getUserByAuth0Id(user.sub);
         
+        // Imposta i dati del form, usando i dati del DB se disponibili, altrimenti usa quelli di Auth0
         setFormData({
           nome: dbUser?.nome || user.given_name || '',
           cognome: dbUser?.cognome || user.family_name || '',
@@ -30,7 +33,7 @@ export default function Register({ updateUserData }) {
         });
       } catch (error) {
         console.error("Errore nel recupero dei dati utente:", error);
-        // Se l'utente non viene trovato, usiamo i dati di Auth0
+        // Se l'utente non viene trovato, usa i dati di Auth0
         setFormData({
           nome: user.given_name || '',
           cognome: user.family_name || '',
@@ -38,29 +41,32 @@ export default function Register({ updateUserData }) {
           data_di_nascita: '',
         });
       } finally {
-        setIsLoading(false);
+        setIsLoading(false);  // Termina il caricamento
       }
     };
 
     if (user) {
-      fetchUserData();
+      fetchUserData();  // Chiama la funzione se l'utente è disponibile
     }
-  }, [user]);
+  }, [user]);  // Esegue l'effetto quando l'utente cambia
 
+  // Gestisce i cambiamenti nei campi del form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Gestisce l'invio del form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsLoading(true);  // Inizia il caricamento
     try {
+      // Prepara i dati da inviare
       const dataToSubmit = {
         ...formData,
         data_di_nascita: formData.data_di_nascita ? new Date(formData.data_di_nascita).toISOString() : null
       };
       let updatedUser;
-      // Sempre tenta di registrare un nuovo utente
+      // Tenta di registrare un nuovo utente
       updatedUser = await registerUser({
         ...dataToSubmit,
         auth0Id: user.sub,
@@ -68,8 +74,8 @@ export default function Register({ updateUserData }) {
         provider: user.sub.split('|')[0],
         isProfileComplete: true
       });
-      updateUserData(updatedUser);
-      navigate("/home", { replace: true });
+      updateUserData(updatedUser);  // Aggiorna i dati utente nello stato globale
+      navigate("/home", { replace: true });  // Naviga alla home
     } catch (error) {
       console.error("Errore durante il completamento del profilo:", error);
       // Se l'utente esiste già, prova ad aggiornarlo
@@ -79,21 +85,23 @@ export default function Register({ updateUserData }) {
             ...dataToSubmit,
             isProfileComplete: true,
           });
-          updateUserData(updatedUser);
-          navigate("/home", { replace: true });
+          updateUserData(updatedUser);  // Aggiorna i dati utente nello stato globale
+          navigate("/home", { replace: true });  // Naviga alla home
         } catch (updateError) {
           console.error("Errore durante l'aggiornamento del profilo:", updateError);
         }
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false);  // Termina il caricamento
     }
   };
 
+  // Mostra un loader durante il caricamento
   if (isLoading) {
     return <div>Caricamento...</div>;
   }
 
+  // Rendering del form
   return (
     <div className="min-h-screen flex items-center justify-center">
       <form 
@@ -102,6 +110,7 @@ export default function Register({ updateUserData }) {
       >
         <h1 className="text-3xl mb-6 text-center">Completa il tuo profilo</h1>
 
+        {/* Campo Nome */}
         <div className="mb-4">
           <input 
             name="nome" 
@@ -114,6 +123,7 @@ export default function Register({ updateUserData }) {
           />
         </div>
 
+        {/* Campo Cognome */}
         <div className="mb-4">
           <input 
             name="cognome" 
@@ -126,6 +136,7 @@ export default function Register({ updateUserData }) {
           />
         </div>
 
+        {/* Campo Email */}
         <div className="mb-4">
           <input 
             name="email" 
@@ -138,6 +149,7 @@ export default function Register({ updateUserData }) {
           />
         </div>
 
+        {/* Campo Data di Nascita */}
         <div className="mb-6">
           <input 
             name="data_di_nascita" 
@@ -149,6 +161,7 @@ export default function Register({ updateUserData }) {
           />
         </div>
 
+        {/* Pulsante di invio */}
         <button 
           type="submit"
           className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"

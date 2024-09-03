@@ -2,9 +2,9 @@ import axiosApi from "./Axios";
 
 // CRUD per gli utenti
 
-export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // riceviamo tutti gli utenti
-export const getUser = (id) => axiosApi.get(`/users/${id}`); // riceviamo un singolo utente
-export const getUserByAuth0Id = async (auth0Id) => {
+export const getUsers = (page = 1) => axiosApi.get(`/users?page=${page}`); // Recupera tutti gli utenti con paginazione
+export const getUser = (id) => axiosApi.get(`/users/${id}`); // Recupera un singolo utente tramite ID
+export const getUserByAuth0Id = async (auth0Id) => { // Recupera un utente tramite Auth0ID
   try {
     const response = await axiosApi.get(`/users/auth0/${auth0Id}`);
     return response.data;
@@ -37,7 +37,7 @@ export const createUser = async (userData) => { // creiamo un utente
     throw error;
   }
 }; 
-export const updateUser = async (id, userData) => {
+export const updateUser = async (id, userData) => { // Aggiorna un utente esistente
   try {
     const response = await axiosApi.patch(`/users/${id}`, userData, {
       headers: {
@@ -51,7 +51,7 @@ export const updateUser = async (id, userData) => {
     throw error;
   }
 };
-export const updateUserAvatar = (id, avatarData) => 
+export const updateUserAvatar = (id, avatarData) => // Aggiorna l'avatar di un utente
   axiosApi.patch(`/users/${id}/avatar`, avatarData, {
     headers: {
       "Content-Type": 'multipart/form-data'
@@ -64,7 +64,7 @@ export const deleteUser = (id) => axiosApi.delete(`/users/${id}`); // eliminiamo
 export const getTransactions = (page = 1, limit = 10) => axiosApi.get(`/transactions?page=${page}&limit=${limit}`); // GET: Recupera tutte le transazioni (con paginazione)
 export const getTransaction = (id) => axiosApi.get(`/transactions/${id}`); // GET: Recupera una transazione specifica tramite ID
 export const getUserTransactions = (userId) => axiosApi.get(`/transactions/user/${userId}`); // GET: Recupera tutte le transazioni di uno specifico utente
-export const createTransaction = async (userId, transactionData) => {
+export const createTransaction = async (userId, transactionData) => { // Crea una nuova transazione
   try {
     console.log("Dati transazione da inviare:", { ...transactionData, user: userId });
     const response = await axiosApi.post("/transactions", { 
@@ -137,12 +137,12 @@ export const getUserData = async () => {
 
 
 // Funzioni per i gruppi
-export const getGroups = () => axiosApi.get('/groups');
-export const createGroup = (groupData) => axiosApi.post('/groups', groupData);
-export const getGroup = (id) => axiosApi.get(`/groups/${id}`);
-export const updateGroup = (id, groupData) => axiosApi.put(`/groups/${id}`, groupData);
-export const deleteGroup = (id) => axiosApi.delete(`/groups/${id}`);
-export const inviteToGroup = async (groupId, userEmail, inviterId) => {
+export const getGroups = () => axiosApi.get('/groups'); // Recupera tutti i gruppi
+export const createGroup = (groupData) => axiosApi.post('/groups', groupData); // Crea un nuovo gruppo
+export const getGroup = (id) => axiosApi.get(`/groups/${id}`); // Recupera un gruppo specifico
+export const updateGroup = (id, groupData) => axiosApi.put(`/groups/${id}`, groupData); // Aggiorna un gruppo esistente
+export const deleteGroup = (id) => axiosApi.delete(`/groups/${id}`); // Elimina un gruppo
+export const inviteToGroup = async (groupId, userEmail, inviterId) => { // Invita un utente a un gruppo
   try {
     const response = await axiosApi.post(`/groups/${groupId}/invite`, { email: userEmail, inviterId });
     return response.data;
@@ -151,7 +151,7 @@ export const inviteToGroup = async (groupId, userEmail, inviterId) => {
     throw error;
   }
 };
-export const createTask = async (groupId, taskData) => {
+export const createTask = async (groupId, taskData) => { // Crea una nuova task in un gruppo
   try {
     console.log('Dati task da inviare:', taskData);
     const response = await axiosApi.post(`/groups/${groupId}/tasks`, taskData);
@@ -162,7 +162,7 @@ export const createTask = async (groupId, taskData) => {
     throw error;
   }
 };
-export const deleteTask = async (groupId, taskId) => {
+export const deleteTask = async (groupId, taskId) => { // Elimina una task da un gruppo
   try {
     const response = await axiosApi.delete(`/groups/${groupId}/tasks/${taskId}`);
     console.log('Task eliminata:', response.data);
@@ -172,12 +172,12 @@ export const deleteTask = async (groupId, taskId) => {
     throw error;
   }
 };
-export const updateTask = (groupId, taskId, taskData) => axiosApi.put(`/groups/${groupId}/tasks/${taskId}`, taskData);
-export const getUserGroupsAndInvites = (userId) => axiosApi.get(`/users/${userId}/groups-and-invites`);
-export const acceptGroupInvite = (inviteId) => axiosApi.post(`/groups/accept-invite/${inviteId}`);
-export const rejectGroupInvite = (inviteId) => axiosApi.post(`/groups/reject-invite/${inviteId}`);
-export const removeUserFromGroup = (groupId, creatorId, userIdToRemove) => axiosApi.post(`/groups/${groupId}/remove-user`, { creatorId, userIdToRemove });
-export const leaveGroup = (groupId, userId) => axiosApi.post(`/groups/${groupId}/leave`, { userId });
+export const updateTask = (groupId, taskId, taskData) => axiosApi.put(`/groups/${groupId}/tasks/${taskId}`, taskData); // Aggiorna una task in un gruppo
+export const getUserGroupsAndInvites = (userId) => axiosApi.get(`/users/${userId}/groups-and-invites`); // Recupera i gruppi e gli inviti di un utente
+export const acceptGroupInvite = (inviteId) => axiosApi.post(`/groups/accept-invite/${inviteId}`); // Accetta un invito a un gruppo
+export const rejectGroupInvite = (inviteId) => axiosApi.post(`/groups/reject-invite/${inviteId}`); // Rifiuta un invito a un gruppo
+export const removeUserFromGroup = (groupId, creatorId, userIdToRemove) => axiosApi.post(`/groups/${groupId}/remove-user`, { creatorId, userIdToRemove }); // Rimuove un utente da un gruppo
+export const leaveGroup = (groupId, userId) => axiosApi.post(`/groups/${groupId}/leave`, { userId }); // Abbandona un gruppo
 
 
 // Funzione per la ricerca degli utenti
