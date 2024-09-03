@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/it';
@@ -30,6 +30,8 @@ const mesiItaliani = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugn
 const giorniItaliani = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 
 export default function Calendar({ tasks, onSelectDate }) {
+  const calendarRef = useRef(null);
+
   // Raggruppa le task per data usando scheduledDate invece di createdAt
   const tasksByDate = tasks.reduce((acc, task) => {
     const date = moment(task.scheduledDate).format('YYYY-MM-DD');
@@ -57,16 +59,49 @@ export default function Calendar({ tasks, onSelectDate }) {
     weekdayFormat: (date) => giorniItaliani[date.getDay()],
   };
 
+  const handleSelectSlot = useCallback(({ start }) => {
+    console.log('Slot selezionato:', start);
+    onSelectDate(start);
+  }, [onSelectDate]);
+
+  const handleSelectEvent = useCallback((event) => {
+    console.log('Evento selezionato:', event.start);
+    onSelectDate(event.start);
+  }, [onSelectDate]);
+
+  useEffect(() => {
+    const calendar = calendarRef.current;
+    if (calendar) {
+      const touchStartHandler = (e) => {
+        if (e.touches.length === 1) {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (targetElement) {
+            targetElement.click();
+          }
+        }
+      };
+
+      calendar.addEventListener('touchstart', touchStartHandler, { passive: false });
+
+      return () => {
+        calendar.removeEventListener('touchstart', touchStartHandler);
+      };
+    }
+  }, []);
+
   return (
-    <div className='h-[500px]'>
+    <div className='h-[500px]' ref={calendarRef}>
       <BigCalendar
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
-        onSelectSlot={({ start }) => onSelectDate(start)}
-        onSelectEvent={(event) => onSelectDate(event.start)}
-        selectable
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={handleSelectEvent}
+        selectable={true}
+        longPressThreshold={10}
         views={['month', 'week', 'day']}
         messages={messages}
         formats={formats}

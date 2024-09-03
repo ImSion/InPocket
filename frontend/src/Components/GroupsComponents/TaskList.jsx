@@ -40,7 +40,7 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTa
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mt-4 mb-2">Tasks per {selectedDate.toLocaleDateString()}</h3>
+      <h3 className="text-lg dark:text-white font-semibold mt-4 mb-2">Tasks per {selectedDate.toLocaleDateString()}</h3>
       <form onSubmit={handleCreateTask} className="mb-4 flex">
         <TextInput
           type="text"

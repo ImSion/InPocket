@@ -32,25 +32,26 @@ export default function InviteForm({ groupId, onSubmit, onCancel }) {
   };
 
   return (
-    <div>
+    <div className='flex flex-col items-center'>
       <TextInput
         type="text"
         placeholder="Cerca utente per nome, cognome o email"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        className='mt-2 w-full sm:w-[445px]'
       />
       <ul className="mt-2">
         {searchResults.map(user => (
           <li 
             key={user._id} 
-            className={`p-2 hover:bg-gray-100 cursor-pointer ${selectedUser?._id === user._id ? 'bg-blue-100' : ''}`}
+            className={`p-2 w-full sm:w-[445px] dark:text-white hover:shadow-[inset_0px_0px_8px] rounded-lg hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer ${selectedUser?._id === user._id ? 'shadow-[inset_0px_0px_12px] dark:shadow-white' : ''}`}
             onClick={() => setSelectedUser(user)}
           >
             {user.nome} {user.cognome} ({user.email})
           </li>
         ))}
       </ul>
-      <div className="mt-4">
+      <div className="mt-4 flex">
         <Button onClick={handleInvite} disabled={!selectedUser}>
           Invita
         </Button>

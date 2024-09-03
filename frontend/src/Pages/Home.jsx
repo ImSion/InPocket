@@ -4,6 +4,7 @@ import { Button, Card, Modal, Dropdown } from 'flowbite-react';  // Importa comp
 import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';  // Importa componenti per i grafici
 import { getUserTransactions, createTransaction, updateTransaction, deleteTransaction, getUserByEmail, getUserByAuth0Id } from '../Modules/ApiCrud';  // Importa funzioni API
 import Transactions from '../Components/Transactions'  // Importa componente Transactions
+import AllTransactionsModal from '../Components/AllTransactionsModal'; //Importa modale per visualizzare tutte le transazioni
 import '../Style/MainCSS.css'  // Importa stili CSS
 
 // Definizione del componente Home che accetta userData come prop
@@ -19,6 +20,7 @@ export default function Home({ userData: propUserData }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);  // Stato per il modale di eliminazione
   const [transactionToDelete, setTransactionToDelete] = useState(null);  // Stato per la transazione da eliminare
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);  // Stato per la transazione selezionata
+  const [showAllTransactions, setShowAllTransactions] = useState(false); // Stato per il modale del totale delle transazioni
   
   // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
@@ -519,8 +521,8 @@ export default function Home({ userData: propUserData }) {
       <div className='flex relative dark:shadow-cyan-800 border-2 dark:border-cyan-500 flex-col xl:w-[1000px] justify-center p-1 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
         {/* Pulsante per aggiungere una nuova transazione */}
         <div className="absolute top-3 left-3">
-          <button onClick={() => handleOpenModal()} className='border-2 border-x-sky-600 border-y-emerald-600 rounded-lg'>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500 shdw-btn">
+          <button onClick={() => handleOpenModal()} className='border-2 border-emerald-600 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-500 hover:scale-105'>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </button>
@@ -533,8 +535,8 @@ export default function Home({ userData: propUserData }) {
           {transactions.slice(0, 10).map((transaction) => (
             <li 
               key={transaction._id} 
-              className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-colors duration-300 ${
-                selectedTransactionId === transaction._id ? 'bg-slate-600 dark:bg-blue-900 h-10 rounded-lg px-5' : ''
+              className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-all ease-in-out duration-500 ${
+                selectedTransactionId === transaction._id ? 'bg-slate-600 dark:bg-sky-600 h-10 rounded-lg px-5' : ''
               }`}
               onClick={() => setSelectedTransactionId(
                 selectedTransactionId === transaction._id ? null : transaction._id
@@ -542,7 +544,7 @@ export default function Home({ userData: propUserData }) {
             >
             <div>
               <span>{transaction.descrizione} - {transaction.importo} €</span>
-              <span className="ml-2 text-sm text-gray-500">
+              <span className="ml-3 text-sm text-zinc-400">
                 {new Date(transaction.data).toLocaleDateString()}
               </span>
             </div>
@@ -555,7 +557,7 @@ export default function Home({ userData: propUserData }) {
                     e.stopPropagation();
                     handleOpenModal(transaction);
                   }} 
-                  className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-800 border border-emerald-600 hover:bg-emerald-900 dark:hover:bg-green-900 shdw"
+                  className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-900 border border-emerald-600 hover:shadow-green-500 hover:shadow-[inset_0px_0px_8px] hover:scale-110 transition-all ease-in-out duration-500"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-emerald-600">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -568,7 +570,7 @@ export default function Home({ userData: propUserData }) {
                     e.stopPropagation();
                     handleDeleteTransaction(transaction._id);
                   }} 
-                  className='w-8 h-7 flex rounded-lg shdw-red items-center justify-center bg-transparent dark:bg-gray-800 border border-red-600 hover:bg-red-900 dark:hover:bg-orange-950'
+                  className='w-8 h-7 flex rounded-lg items-center justify-center bg-transparent dark:bg-gray-900 border border-red-600 hover:shadow-red-500 hover:shadow-[inset_0px_0px_8px] hover:scale-110 transition-all ease-in-out duration-500'
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-red-600">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -584,8 +586,8 @@ export default function Home({ userData: propUserData }) {
             {transactions.slice(10, 20).map((transaction) => (
               <li 
                 key={transaction._id} 
-                className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-colors duration-300 ${
-                  selectedTransactionId === transaction._id ? 'bg-blue-100 dark:bg-blue-900' : ''
+                className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-all ease-in-out duration-500 ${
+                  selectedTransactionId === transaction._id ? 'bg-slate-600 dark:bg-sky-600 h-10 rounded-lg px-5' : ''
                 }`}
                 onClick={() => setSelectedTransactionId(
                   selectedTransactionId === transaction._id ? null : transaction._id
@@ -606,7 +608,7 @@ export default function Home({ userData: propUserData }) {
                         e.stopPropagation();
                         handleOpenModal(transaction);
                       }} 
-                      className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-800 border border-emerald-600 hover:bg-emerald-900 dark:hover:bg-green-900 shdw"
+                      className="mr-2 w-8 h-7 flex items-center rounded-lg justify-center bg-transparent dark:bg-gray-900 border border-emerald-600 hover:shadow-green-500 hover:shadow-[inset_0px_0px_8px] hover:scale-110 transition-all ease-in-out duration-500"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-emerald-600">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -619,7 +621,7 @@ export default function Home({ userData: propUserData }) {
                         e.stopPropagation();
                         handleDeleteTransaction(transaction._id);
                       }} 
-                      className='w-8 h-7 flex rounded-lg shdw-red items-center justify-center bg-transparent dark:bg-gray-800 border border-red-600 hover:bg-red-900 dark:hover:bg-orange-950'
+                      className='w-8 h-7 flex rounded-lg items-center justify-center bg-transparent border border-red-600 hover:shadow-red-500 hover:shadow-[inset_0px_0px_8px] hover:scale-110 transition-all ease-in-out duration-500'
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-red-600">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -631,10 +633,15 @@ export default function Home({ userData: propUserData }) {
             ))}
           </ul>
         </div>
+        <div className="mt-4 text-center flex justify-center">
+          <button onClick={() => setShowAllTransactions(true)} className='my-2 text-sky-700 dark:text-cyan-400 p-3 shadow-[inset_0px_0px_8px] hover:shadow-[inset_0px_0px_15px] hover:scale-105 rounded-full transition-all ease-in-out duration-500'>
+            Visualizza tutte le transazioni
+          </button>
+        </div>
       </div>
 
       {/* Top Categorie di Spesa */}
-      <Card className="mt-4 dark:border-cyan-500 border-2 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
+      <Card className="mt-4 dark:border-cyan-500 xl:w-[1000px] border-2 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
         <h2 className="text-xl font-semibold mb-2 dark:text-white">In cosa spendi di più (Annuale)</h2>
         {(() => {
           const { categories, totalAnnualExpenses } = getTopExpenseCategories();
@@ -681,6 +688,13 @@ export default function Home({ userData: propUserData }) {
           transaction={currentTransaction}
         />
       )}
+
+      {/* Modale per tutte le transazioni */}
+      <AllTransactionsModal 
+        show={showAllTransactions}
+        onClose={() => setShowAllTransactions(false)}
+        transactions={transactions}
+      />
 
       {/* Modale di conferma eliminazione */}
       <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>

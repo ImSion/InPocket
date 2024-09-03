@@ -162,18 +162,18 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-2">Gruppo: {group.name}</h2>
+      <h2 className="text-xl dark:text-white font-semibold mb-2">Gruppo: {group.name}</h2>
       <p>{group.description}</p>
 
       <div className='flex justify-center'>
-        <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4 h-10 flex justify-center items-center p-2 py-5">
+        <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4 fade-in h-10 flex justify-center items-center p-2 py-5">
           Invita Utente
         </Button>
-        <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 ml-2 h-10 flex justify-center items-center p-2 py-5">
+        <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 fade-in ml-2 h-10 flex justify-center items-center p-2 py-5">
           Mostra Membri
         </Button>
         {isCreator ? (
-          <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 ml-2 h-10 flex justify-center items-center p-2 py-5">
+          <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 fade-in ml-2 h-10 flex justify-center items-center p-2 py-5">
             Elimina Gruppo
           </Button>
         ) : (
@@ -192,14 +192,14 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       )}
       
       <div className="flex flex-col justify-center items-center mt-4">
-        <div className="w-full">
+        <div className="w-full fade-in">
         <Calendar 
-  tasks={group.tasks} 
-  onSelectDate={(date) => {
-    console.log('Data selezionata in Calendar:', date);
-    setSelectedDate(date);
-  }}
-/>
+          tasks={group.tasks} 
+          onSelectDate={(date) => {
+            console.log('Data selezionata in Calendar:', date);
+            setSelectedDate(date);
+          }}
+        />
         </div>
         <div className="w-full">
         <TaskList 

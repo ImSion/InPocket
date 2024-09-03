@@ -84,7 +84,4 @@ Garantisce che i dati dell'utente siano disponibili immediatamente dopo l'autent
 Permette una gestione fluida dello stato dell'utente, essenziale per funzionalità come la personalizzazione
 dell'interfaccia e la gestione delle autorizzazioni.
 
-In sintesi, useUserData è un componente fondamentale dell'architettura dell'applicazione, che gestisce l'integrazione 
-tra l'autenticazione Auth0 e i dati utente specifici dell'applicazione. Il suo utilizzo in componenti 
-chiave assicura che l'esperienza utente sia coerente e personalizzata in tutta l'applicazione.
 */

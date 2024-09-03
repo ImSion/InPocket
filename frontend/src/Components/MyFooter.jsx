@@ -39,8 +39,8 @@ import {
               <div>
                 <FooterTitle title="Follow us" />
                 <FooterLinkGroup col>
-                  <FooterLink href="#">Github</FooterLink>
-                  <FooterLink href="#">Discord</FooterLink>
+                  <FooterLink href="https://github.com/ImSion">Github</FooterLink>
+                  <FooterLink href="https://www.linkedin.com/in/gabriele-romano-69aa81252/?originalSubdomain=it">Linkedin</FooterLink>
                 </FooterLinkGroup>
               </div>
               <div>
@@ -54,7 +54,7 @@ import {
           </div>
           <FooterDivider />
           <div className="w-full sm:flex sm:items-center sm:justify-between">
-            <FooterCopyright href="#" by="Flowbite™" year={2022} />
+            <FooterCopyright href="#" by="InPocket™" year={2024} />
             <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
               <FooterIcon href="#" icon={BsFacebook} />
               <FooterIcon href="#" icon={BsInstagram} />
