@@ -81,13 +81,18 @@ export default function Groups({ userData }) {
   // Rendering del componente
   return (
     <div className=" mx-auto p-4 min-h-screen">
+      <div className='flex flex-col items-center justify-center'>
       <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
-      <div className='flex justify-between'>
-        <div className='flex flex-col'>
-          {/* Pulsante per creare un nuovo gruppo */}
+      {/* Pulsante per creare un nuovo gruppo */}
           <button onClick={() => setShowCreateForm(true)} className="bg-cyan-500 h-10 text-white px-4 py-2 rounded mb-4">
             Crea Nuovo Gruppo
           </button>
+
+      </div>
+          
+      <div className='flex justify-between'>
+        <div className='flex flex-col'>
+          
 
           {/* Lista degli inviti */}
           <InvitesList 

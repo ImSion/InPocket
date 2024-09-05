@@ -5,19 +5,19 @@ import InviteForm from './InviteForm';
 import axios from 'axios';
 import Calendar from './Calendar';
 import { deleteTask } from '../../Modules/ApiCrud';
-import { Button, Modal } from 'flowbite-react';
+import { Button, Modal, Avatar } from 'flowbite-react';
 import { NotificationContext } from '../../Contexts/NotificationContext';
 
 export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, userData }) {
   const [group, setGroup] = useState(initialGroup);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showMembersList, setShowMembersList] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedMember, setSelectedMember] = useState(null);
   const { addNotification, showAlert  } = useContext(NotificationContext);
 
   useEffect(() => {
-    console.log('Gruppo ricevuto:', initialGroup);
+    // console.log('Gruppo ricevuto:', initialGroup);
     setGroup(initialGroup);
   }, [initialGroup]);
 
@@ -25,7 +25,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     const fetchGroupDetails = async () => {
       try {
         const response = await getGroup(initialGroup._id);
-        console.log('Dettagli del gruppo recuperati:', response.data);
+        // console.log('Dettagli del gruppo recuperati:', response.data);
         setGroup(response.data);
       } catch (error) {
         console.error('Errore nel recupero dei dettagli del gruppo:', error);
@@ -36,8 +36,8 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   }, [initialGroup._id]);
 
   useEffect(() => {
-    console.log('Group creator:', group.creator);
-    console.log('Current user ID:', userData._id);
+    // console.log('Group creator:', group.creator);
+    // console.log('Current user ID:', userData._id);
     checkOverdueTasks();
   }, [group, userData]);
 
@@ -58,6 +58,10 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         message: `Ci sono ${overdueTasks.length} task non completate da più di 3 giorni!` 
       });
     }
+  };
+
+  const handleMemberClick = (member) => {
+    setSelectedMember(selectedMember === member ? null : member);
   };
 
   const handleInvite = async (selectedUser) => {
@@ -158,28 +162,67 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     } catch (error) {
       console.error('Errore nel refresh dei dati del gruppo:', error);
     }
-  };
+  }; 
 
   return (
     <div className="w-full">
       <h2 className="text-xl dark:text-white font-semibold mb-2">Gruppo: {group.name}</h2>
-      <p>{group.description}</p>
+      <p className="dark:text-gray-300 mb-4">{group.description}</p>
+
+      {/* Membri del gruppo */}
+      <div className="mb-6">
+        <h3 className="text-lg dark:text-white font-semibold mb-2">Membri del gruppo:</h3>
+        <div className="flex flex-wrap gap-4">
+          {group.members.map(member => (      
+            <div key={member._id} className="flex flex-col items-center">
+              <Avatar
+                onClick={() => handleMemberClick(member)} 
+                img={member.avatar || "https://via.placeholder.com/150"} 
+                alt={`${member.nome} ${member.cognome}`}
+                size="lg"
+                className='cursor-pointer' 
+                rounded
+              />
+              <button 
+                onClick={() => handleMemberClick(member)}
+                className="mt-2 text-sm dark:text-white hover:underline"
+              >
+                {member.nome} {member.cognome}
+              </button>
+              {selectedMember === member && (
+                <div className="mt-2 text-xs dark:text-gray-300">
+                  <p>{member.email}</p>
+                  {isCreator && member._id !== userData._id && (
+                    <Button 
+                      color="failure" 
+                      size="xs" 
+                      onClick={() => handleRemoveUser(member._id)}
+                      className="mt-1"
+                    >
+                      Rimuovi
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className='flex justify-center'>
-        <Button color="success" onClick={() => setShowInviteForm(true)} className="mt-4 fade-in h-10 flex justify-center items-center p-2 py-5">
+        <button onClick={() => setShowInviteForm(true)} 
+        className="mt-4 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-emerald-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-emerald-600 hover:shadow-[inset_0px_0px_16px] hover:shadow-emerald-400 transition-all ease-in-out duration-500">
           Invita Utente
-        </Button>
-        <Button color="info" onClick={() => setShowMembersList(true)} className="mt-4 fade-in ml-2 h-10 flex justify-center items-center p-2 py-5">
-          Mostra Membri
-        </Button>
+        </button>
         {isCreator ? (
-          <Button color="failure" onClick={() => setShowDeleteModal(true)} className="mt-4 fade-in ml-2 h-10 flex justify-center items-center p-2 py-5">
+          <button onClick={() => setShowDeleteModal(true)} 
+          className="mt-4 ml-2 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-red-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-red-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-red-700 transition-all ease-in-out duration-500">
             Elimina Gruppo
-          </Button>
+          </button>
         ) : (
-          <Button color="warning" onClick={handleLeaveGroup} className="mt-4 ml-2">
+          <button onClick={handleLeaveGroup} className="mt-4 ml-2 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-yellow-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-yellow-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-yellow-700 transition-all ease-in-out duration-500">
             Abbandona Gruppo
-          </Button>
+          </button>
         )}
       </div>
 
@@ -213,31 +256,6 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     />
         </div>
       </div>
-
-      <Modal show={showMembersList} onClose={() => setShowMembersList(false)}>
-        <Modal.Header>Membri del Gruppo</Modal.Header>
-        <Modal.Body>
-          <ul>
-          {group.members.map(member => (
-            <li key={member._id} className="flex justify-between items-center mb-2">
-              <div>
-                <span>
-                  {member.nome || member.name || 'N/A'} {member.cognome || member.surname || 'N/A'}
-                </span>
-                <span className="ml-2 text-sm text-gray-500">
-                  ({member.email || 'Email non disponibile'})
-                </span>
-              </div>
-              {isCreator && member._id !== userData._id && (
-                <Button color="failure" size="sm" onClick={() => handleRemoveUser(member._id)}>
-                  Rimuovi
-                </Button>
-              )}
-            </li>
-          ))}
-          </ul>
-        </Modal.Body>
-      </Modal>
       
       <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
         <Modal.Header>Conferma eliminazione</Modal.Header>

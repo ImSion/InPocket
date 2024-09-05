@@ -1,0 +1,81 @@
+/* Stile per i bottoni della toolbar */
+.rbc-btn-group button {
+    @apply bg-transparent text-black dark:text-white border border-black dark:border-sky-600 shadow-[inset_0px_0px_8px] dark:shadow-[inset_0px_0px_8px] dark:shadow-sky-500 px-3 py-1 rounded-lg transition-all ease-in-out duration-500;
+  }
+  
+  .rbc-btn-group button:hover {
+    @apply bg-transparent shadow-[inset_0px_0px_5px] shadow-black dark:shadow-[inset_0px_0px_15px] dark:shadow-sky-500;
+  }
+  
+  .rbc-btn-group button.rbc-active {
+    @apply bg-sky-500 dark:bg-sky-600 text-white border-sky-500 dark:border-sky-600;
+  }
+  
+  /* Stile per le caselle dei giorni */
+  .rbc-date-cell {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+  
+  /* Stile per il numero del giorno */
+  .rbc-date-cell > a {
+    @apply hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full inline-block w-8 h-8 leading-8 text-center;
+  }
+  
+  /* Stile per il giorno corrente */
+  .rbc-now {
+    @apply font-bold;
+  }
+
+  .rbc-today {
+    @apply bg-sky-500 bg-opacity-80 
+  }
+
+  .rbc-row-bg {
+    @apply border-black
+  }
+
+  .rbc-day-bg {
+    @apply hover:bg-sky-400 transition-all ease-in-out duration-500
+  }
+
+  .rbc-button-link {
+    @apply text-black dark:text-white
+  }
+  
+  /* Stile per gli eventi nelle caselle */
+  .rbc-event {
+    @apply bg-blue-950 dark:bg-teal-700 border-none rounded-full px-1 flex items-center justify-center w-16;
+  }
+
+  .rbc-row-segment {
+    @apply flex items-center justify-center
+  }
+  
+  /* Stile per il testo "show more" */
+  .rbc-show-more {
+    @apply text-blue-500 dark:text-blue-400 hover:underline;
+  }
+  
+  /* Stile per l'intestazione del mese */
+  .rbc-toolbar-label {
+    @apply text-lg font-bold text-gray-800 dark:text-gray-200;
+  }
+  
+  /* Stile per i giorni della settimana */
+  .rbc-header {
+    @apply py-2 border-b border-gray-300 dark:border-gray-600 font-semibold text-black dark:text-white;
+  }
+  
+  /* Stile per le celle fuori dal mese corrente */
+  .rbc-off-range-bg {
+    @apply bg-transparent dark:bg-zinc-900 hover:bg-red-500 shadow-[inset_0px_0px_20px] shadow-red-500 dark:shadow-[inset_0px_0px_4px]  ;
+  }
+
+  /* stile per il calendario */
+  .rbc-month-view {
+    @apply  shadow-[0px_0px_8px] dark:shadow-[0px_0px_8px] dark:shadow-sky-500 rounded-lg  bg-opacity-90
+  }
+
+  .rbc-month-row{
+    @apply shadow-[0px_0px_8px] dark:shadow-[0px_0px_8px] dark:shadow-sky-500 rounded-lg  bg-opacity-90
+  }

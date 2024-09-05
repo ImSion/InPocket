@@ -62,13 +62,13 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTa
               className="mr-2"
             />
             <span 
-              className={`flex-grow cursor-pointer ${task.completed ? 'line-through' : ''}`}
+              className={`flex-grow cursor-pointer dark:text-white text-black ${task.completed ? 'line-through' : ''}`}
               onClick={() => setSelectedTaskId(selectedTaskId === task._id ? null : task._id)}
             >
               {task.description}
             </span>
             {task.completed && task.completionNote && (
-              <span className="ml-2 text-sm text-gray-500">({task.completionNote})</span>
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">({task.completionNote})</span>
             )}
             {selectedTaskId === task._id && (
               <Button 

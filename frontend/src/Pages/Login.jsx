@@ -34,7 +34,7 @@ export default function Login() {
         <div className="fixed top-0 left-0 w-full h-full bg-white dark:bg-black flex flex-col items-center justify-center z-50 fade-out-left">
           <img src={logo} className="h-96 fade-in" alt="Logo InPocket" />
           <h1 className={`text-xl mt-10 dark:text-white sm:text-3xl sm:w-[420px] mb-10 font-bold text-center typewriter 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-          Benvenuto in InPocket
+          Benvenuti in InPocket
           </h1>
         </div>
       )}

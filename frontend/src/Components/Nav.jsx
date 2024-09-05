@@ -29,7 +29,7 @@ export default function Nav({ userData }) {
   const profileImage = userData?.avatar || user?.picture;
 
   return (
-    <Navbar className="fixed w-full z-10 bottom-0" fluid>
+    <Navbar className="fixed w-full z-10 bottom-0 dark:bg-black" fluid>
       <NavbarBrand href="/home">
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">In</span>
         <img src={logo} className="h-10 sm:h-9" alt="Logo InPocket" />
@@ -46,7 +46,8 @@ export default function Nav({ userData }) {
               label={
                 <Avatar 
                   alt="User settings" 
-                  img={profileImage} 
+                  img={profileImage}
+                  className="shadow-[0px_0px_8px]" 
                 />
               }
             >
@@ -55,15 +56,21 @@ export default function Nav({ userData }) {
                   {userData?.email || user.email || 'Email non disponibile'}
                 </span>
               </DropdownHeader>
-              <DropdownItem>
-                <Link to={'/profile'}>
+              <DropdownItem className="flex items-center justify-center text-lg">
+                <Link to={'/profile'} className="flex items-center gap-2">
                   Profilo
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
                 </Link>
               </DropdownItem>
-              <DropdownItem>Settings</DropdownItem>
-              <DropdownItem>Earnings</DropdownItem>
               <DropdownDivider />
-              <DropdownItem onClick={() => logout({ returnTo: window.location.origin })}>Sign out</DropdownItem>
+              <DropdownItem className="flex items-center justify-center text-lg gap-2" onClick={() => logout({ returnTo: window.location.origin })}>
+                Logout
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+                </DropdownItem>
             </Dropdown>
             <NavbarToggle className="ml-2"/>
           </>

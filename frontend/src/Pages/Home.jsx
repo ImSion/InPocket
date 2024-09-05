@@ -239,69 +239,69 @@ export default function Home({ userData: propUserData }) {
 
   // Funzione per preparare i dati finanziari per i grafici a torta
   const pieFinancialData = () => {
-    let totalEntrateAnnuali = 0;
-    let totalUsciteAnnuali = 0;
-    let totalEntrateMensili = 0;
-    let totalUsciteMensili = 0;
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
+    let totalEntrateAnnuali = 0;                                   // Inizializza il totale delle entrate annuali
+    let totalUsciteAnnuali = 0;                                    // Inizializza il totale delle uscite annuali
+    let totalEntrateMensili = 0;                                   // Inizializza il totale delle entrate mensili
+    let totalUsciteMensili = 0;                                    // Inizializza il totale delle uscite mensili
+    const currentDate = new Date();                                // Ottiene la data corrente
+    const currentMonth = currentDate.getMonth();                   // Ottiene il mese corrente (0-11)
+    const currentYear = currentDate.getFullYear();                 // Ottiene l'anno corrente
     
-    const usciteColors = [
+    const usciteColors = [                                         // Array di colori per le categorie di uscite
       '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', 
       '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', 
       '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', 
       '#FF5722', '#795548', '#9E9E9E', '#607D8B'
     ];
   
-    const categoryColorMap = {};
+    const categoryColorMap = {};                                   // Oggetto per mappare categorie a colori
   
-    const data = transactions.reduce((acc, t) => {
-      const transactionDate = new Date(t.data);
-      const importo = parseFloat(t.importo);
-      const isCurrentMonth = transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
+    const data = transactions.reduce((acc, t) => {                 // Riduce le transazioni in un oggetto accumulatore
+      const transactionDate = new Date(t.data);                    // Converte la data della transazione in oggetto Date
+      const importo = parseFloat(t.importo);                       // Converte l'importo in numero
+      const isCurrentMonth = transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;  // Verifica se la transazione è del mese corrente
   
-      if (t.tipo === 'entrata') {
-        totalEntrateAnnuali += importo;
-        if (isCurrentMonth) totalEntrateMensili += importo;
-        if (!acc.entrate[t.categoria]) {
-          acc.entrate[t.categoria] = { valueAnnuale: 0, valueMensile: 0, fill: '#4CAF50' };
-          categoryColorMap[t.categoria] = '#4CAF50';
+      if (t.tipo === 'entrata') {                                  // Se la transazione è un'entrata
+        totalEntrateAnnuali += importo;                            // Aggiunge all'importo totale annuale
+        if (isCurrentMonth) totalEntrateMensili += importo;        // Se è del mese corrente, aggiunge al totale mensile
+        if (!acc.entrate[t.categoria]) {                           // Se la categoria non esiste nell'accumulatore
+          acc.entrate[t.categoria] = { valueAnnuale: 0, valueMensile: 0, fill: '#4CAF50' };  // Inizializza la categoria
+          categoryColorMap[t.categoria] = '#4CAF50';               // Assegna il colore verde alle entrate
         }
-        acc.entrate[t.categoria].valueAnnuale += importo;
-        if (isCurrentMonth) acc.entrate[t.categoria].valueMensile += importo;
-      } else {
-        totalUsciteAnnuali += importo;
-        if (isCurrentMonth) totalUsciteMensili += importo;
-        if (!acc.uscite[t.categoria]) {
-          const color = usciteColors[Object.keys(acc.uscite).length % usciteColors.length];
-          acc.uscite[t.categoria] = { valueAnnuale: 0, valueMensile: 0, fill: color };
-          categoryColorMap[t.categoria] = color;
+        acc.entrate[t.categoria].valueAnnuale += importo;          // Aggiunge l'importo al valore annuale della categoria
+        if (isCurrentMonth) acc.entrate[t.categoria].valueMensile += importo;  // Se è del mese corrente, aggiunge al valore mensile
+      } else {                                                     // Se la transazione è un'uscita
+        totalUsciteAnnuali += importo;                             // Aggiunge all'importo totale annuale delle uscite
+        if (isCurrentMonth) totalUsciteMensili += importo;         // Se è del mese corrente, aggiunge al totale mensile delle uscite
+        if (!acc.uscite[t.categoria]) {                            // Se la categoria non esiste nell'accumulatore
+          const color = usciteColors[Object.keys(acc.uscite).length % usciteColors.length];  // Seleziona un colore ciclicamente
+          acc.uscite[t.categoria] = { valueAnnuale: 0, valueMensile: 0, fill: color };  // Inizializza la categoria
+          categoryColorMap[t.categoria] = color;                   // Assegna il colore alla categoria
         }
-        acc.uscite[t.categoria].valueAnnuale += importo;
-        if (isCurrentMonth) acc.uscite[t.categoria].valueMensile += importo;
+        acc.uscite[t.categoria].valueAnnuale += importo;           // Aggiunge l'importo al valore annuale della categoria
+        if (isCurrentMonth) acc.uscite[t.categoria].valueMensile += importo;  // Se è del mese corrente, aggiunge al valore mensile
       }
-      return acc;
-    }, { entrate: {}, uscite: {} });
+      return acc;                                                  // Restituisce l'accumulatore aggiornato
+    }, { entrate: {}, uscite: {} });                               // Inizializza l'accumulatore con entrate e uscite vuote
   
-    const pieDataAnnuale = [
+    const pieDataAnnuale = [                                       // Crea l'array di dati per il grafico a torta annuale
       ...Object.entries(data.entrate).map(([name, { valueAnnuale, fill }]) => ({ name: `Entrata - ${name}`, value: valueAnnuale, fill })),
       ...Object.entries(data.uscite).map(([name, { valueAnnuale, fill }]) => ({ name: `Uscita - ${name}`, value: valueAnnuale, fill }))
     ];
   
-    const pieDataMensile = [
+    const pieDataMensile = [                                       // Crea l'array di dati per il grafico a torta mensile
       ...Object.entries(data.entrate)
-        .filter(([_, { valueMensile }]) => valueMensile > 0)
+        .filter(([_, { valueMensile }]) => valueMensile > 0)       // Filtra solo le categorie con valore mensile > 0
         .map(([name, { valueMensile, fill }]) => ({ name: `Entrata - ${name}`, value: valueMensile, fill })),
       ...Object.entries(data.uscite)
-        .filter(([_, { valueMensile }]) => valueMensile > 0)
+        .filter(([_, { valueMensile }]) => valueMensile > 0)       // Filtra solo le categorie con valore mensile > 0
         .map(([name, { valueMensile, fill }]) => ({ name: `Uscita - ${name}`, value: valueMensile, fill }))
     ];
   
-    const saldoAnnuale = totalEntrateAnnuali - totalUsciteAnnuali;
-    const saldoMensile = totalEntrateMensili - totalUsciteMensili;
+    const saldoAnnuale = totalEntrateAnnuali - totalUsciteAnnuali; // Calcola il saldo annuale
+    const saldoMensile = totalEntrateMensili - totalUsciteMensili; // Calcola il saldo mensile
   
-    return { 
+    return {                                                       // Restituisce un oggetto con tutti i dati calcolati
       pieDataAnnuale, 
       pieDataMensile, 
       saldoAnnuale, 

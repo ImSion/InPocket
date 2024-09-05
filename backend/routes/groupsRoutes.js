@@ -56,8 +56,8 @@ router.get('/:id', async (req, res) => {
   try {
     // Trova il gruppo per ID e popola i campi members e creator
     const group = await Group.findById(req.params.id)
-      .populate('members', 'nome cognome email')
-      .populate('creator', 'nome cognome email')
+      .populate('members', 'nome cognome email avatar') 
+      .populate('creator', 'nome cognome email avatar')
       .lean();  // Uso .lean() per ottenere un oggetto JavaScript semplice
 
     if (!group) {

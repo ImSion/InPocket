@@ -48,6 +48,7 @@
   animation: shake 0.8s ease-in-out;
 }
 
+
 /* Animazione per la dissolvenza in entrata */
 @keyframes fadeIn {
     from { opacity: 0; }

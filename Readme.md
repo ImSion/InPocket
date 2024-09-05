@@ -106,8 +106,38 @@ InPocket è un'applicazione di gestione finanziaria personale che permette agli 
 
 ### Frontend (React)
 
+- **Tecnologie e librerie principali:
+  - React: per la costruzione dell'interfaccia utente
+  - React Router: per la gestione della navigazione
+  - Auth0: per l'autenticazione degli utenti
+  - Axios: per le chiamate API
+  - Recharts: per la visualizzazione dei grafici
+  - react-big-calendar: per il componente calendario
+  - Flowbite React: per componenti UI predefiniti
+  - Tailwind CSS: per lo styling
+
+- **Punti focali:
+*Gestione dello stato:
+  - Utilizzo di React Hooks (useState, useEffect, useContext) per la gestione dello stato e degli effetti collaterali
+  - Context API per la gestione dello stato globale (es. NotificationContext)
+
+*Autenticazione:
+  - Integrazione con Auth0 per una gestione sicura dell'autenticazione
+  - Utilizzo di AuthWrapper per proteggere le route autenticate
+
+*Visualizzazione dati:
+  - Utilizzo di Recharts per creare grafici interattivi (es. andamento entrate/uscite, spese per categoria)
+  - Implementazione di un calendario personalizzato con react-big-calendar
+
+*Gestione tema chiaro/scuro:
+  - Implementazione di un toggle per il cambio tema utilizzando Tailwind CSS e Flowbite
+
+*Comunicazione con il backend:
+  - Utilizzo di Axios per effettuare chiamate API RESTful al backend
+  - Implementazione di funzioni CRUD in ApiCrud.js per interagire con il backend
+
 - **Pagine Principali**:
-  - Home: Dashboard con grafici e statistiche
+  - Home: Dashboard con grafici e statistiche finanziarie
   - Groups: Gestione dei gruppi finanziari
   - UserProfile: Profilo utente e impostazioni
   - Login/Register: Autenticazione utente
@@ -124,6 +154,13 @@ InPocket è un'applicazione di gestione finanziaria personale che permette agli 
   - Toggle tema chiaro/scuro
 
 ### Backend (Node.js/Express)
+
+- **Tecnologie principali:
+  - Express.js: framework web per Node.js
+  - Mongoose: ODM per MongoDB
+  - JSON Web Tokens (JWT): per l'autenticazione
+  - Cloudinary: per la gestione delle immagini di profilo
+  - Cors: per la gestione delle richieste cross-origin
 
 - **API Routes**:
   - `/users`: Gestione degli utenti
