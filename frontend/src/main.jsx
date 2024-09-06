@@ -14,6 +14,11 @@ const callbackUrl = import.meta.env.MODE === 'development'
 ? 'http://localhost:5173'
 : 'https://in-pocket.vercel.app';
 
+console.log('Mode:', import.meta.env.MODE);
+console.log('Domain:', domain);
+console.log('Client ID:', clientId);
+console.log('Callback URL:', callbackUrl);
+
 // Crea e renderizza l'applicazione React
 ReactDOM.createRoot(document.getElementById('root')).render(
   // Attiva controlli aggiuntivi e avvertimenti in modalità sviluppo
