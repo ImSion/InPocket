@@ -11,8 +11,8 @@ const clientId = import.meta.env.MODE === 'development'
   : import.meta.env.VITE_AUTH0_CLIENT_ID;
 
 const callbackUrl = import.meta.env.MODE === 'development' 
-  ? 'http://localhost:5173'
-  : 'https://in-pocket.vercel.app/login';
+? 'http://localhost:5173'
+: 'https://in-pocket.vercel.app/login';
 
 // Crea e renderizza l'applicazione React
 ReactDOM.createRoot(document.getElementById('root')).render(

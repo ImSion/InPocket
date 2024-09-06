@@ -24,7 +24,7 @@ import {
       // Queste sono gli URL da cui il nostro frontend farà richieste al backend.
       const whitelist = [
         'http://localhost:5173', // Frontend in sviluppo
-        'https://in-pocket.vercel.app/', // Frontend in produzione (prendere da vercel!)
+        'https://in-pocket.vercel.app', // Frontend in produzione (prendere da vercel!)
         'https://inpocket.onrender.com' // URL del backend (prendere da render!)
       ];
       
