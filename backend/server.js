@@ -25,7 +25,7 @@ import {
       const whitelist = [
         'http://localhost:5173', // Frontend in sviluppo
         'https://in-pocket.vercel.app/', // Frontend in produzione (prendere da vercel!)
-        '' // URL del backend (prendere da render!)
+        'https://inpocket.onrender.com' // URL del backend (prendere da render!)
       ];
       
       if (process.env.NODE_ENV === 'development') {
