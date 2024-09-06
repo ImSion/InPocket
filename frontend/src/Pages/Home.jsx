@@ -122,7 +122,7 @@ export default function Home({ userData: propUserData }) {
     <>
       {/* Versione mobile (dropdown) */}
       <div className="md:hidden mt-2">
-        <Dropdown label={title} dismissOnClick={false}>
+        <Dropdown label={title} dismissOnClick={false} arrowIcon={false}>
           <Dropdown.Item>
             <div className="flex flex-col items-start">
               {data.map((entry, index) => (
@@ -438,7 +438,7 @@ export default function Home({ userData: propUserData }) {
   return (
     <div className='xl:flex xl:flex-col xl:items-center'>
       {/* Header con benvenuto e titolo dashboard */}
-      <div className='flex justify-between xl:w-[1000px]'>
+      <div className='flex justify-between xl:w-[1200px]'>
         <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake">
           Bentornato, {userData?.nome || user.name}
         </h1>
@@ -449,7 +449,7 @@ export default function Home({ userData: propUserData }) {
       
       {/* Sezione dei grafici */}
       {/* Grafico a torta */}
-      <div className='w-full xl:w-[1000px] fade-in flex flex-col items-center justify-center mb-4 border-2 rounded-lg dark:border-cyan-500 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+      <div className='w-full xl:w-[1200px] fade-in flex flex-col items-center justify-center mb-4 border-2 rounded-lg dark:border-cyan-500 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
         <h2 className="text-xl font-semibold mb-2 mt-2 dark:text-white">Ripartizione Finanziaria</h2>
         <PieExpensesGraphic data={pieFinancialData()}/>
         {/* Riepilogo entrate e uscite */}
@@ -482,7 +482,7 @@ export default function Home({ userData: propUserData }) {
       {/* Grafici a linee e a barre */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* Grafico Entrate/Uscite */}
-        <div className='flex-col xl:w-[494px] dark:shadow-cyan-800 dark:border-cyan-500 fade-in-left h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+        <div className='flex-col xl:w-[593px] dark:shadow-cyan-800 dark:border-cyan-500 fade-in-left h-full border-2 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
           <h2 className="text-xl font-semibold mb-2 dark:text-white">Entrate/Uscite</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
@@ -498,7 +498,7 @@ export default function Home({ userData: propUserData }) {
         </div>
         
         {/* Grafico Uscite per Categoria */}
-        <div className='flex-col xl:w-[494px] dark:shadow-cyan-800 fade-in-right h-full border-2 dark:border-cyan-500 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+        <div className='flex-col xl:w-[593px] dark:shadow-cyan-800 fade-in-right h-full border-2 dark:border-cyan-500 p-1 rounded-lg shadow-md justify-center items-center text-center bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
           <h2 className="text-xl font-semibold mb-2 dark:text-white">Uscite per Categoria</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={barChartData}>
@@ -518,7 +518,7 @@ export default function Home({ userData: propUserData }) {
       </div>
       
       {/* Lista delle transazioni recenti */}
-      <div className='flex relative dark:shadow-cyan-800 border-2 dark:border-cyan-500 flex-col xl:w-[1000px] justify-center p-1 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+      <div className='flex relative dark:shadow-cyan-800 border-2 dark:border-cyan-500 flex-col xl:w-[1200px] justify-center p-1 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
         {/* Pulsante per aggiungere una nuova transazione */}
         <div className="absolute top-3 left-3">
           <button onClick={() => handleOpenModal()} className='border-2 border-emerald-600 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-500 hover:scale-105'>
@@ -641,7 +641,7 @@ export default function Home({ userData: propUserData }) {
       </div>
 
       {/* Top Categorie di Spesa */}
-      <Card className="mt-4 dark:border-cyan-500 xl:w-[1000px] border-2 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
+      <Card className="mt-4 dark:border-cyan-500 xl:w-[1200px] border-2 shadow-md dark:shadow-cyan-800 bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90">
         <h2 className="text-xl font-semibold mb-2 dark:text-white">In cosa spendi di più (Annuale)</h2>
         {(() => {
           const { categories, totalAnnualExpenses } = getTopExpenseCategories();

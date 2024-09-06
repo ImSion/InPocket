@@ -17,16 +17,36 @@ import {
     notFoundHandler,
     genericErrorHandler,
   } from "./Middlewares/errorsHandler.js";
+  
+  const corsOptions = {
+    origin: function (origin, callback) {
+      // Definiamo una whitelist di origini consentite. 
+      // Queste sono gli URL da cui il nostro frontend farà richieste al backend.
+      const whitelist = [
+        'http://localhost:5173', // Frontend in sviluppo
+        'https://in-pocket.vercel.app/', // Frontend in produzione (prendere da vercel!)
+        '' // URL del backend (prendere da render!)
+      ];
+      
+      if (process.env.NODE_ENV === 'development') {
+        // In sviluppo, permettiamo anche richieste senza origine (es. Postman)
+        callback(null, true);
+      } else if (whitelist.indexOf(origin) !== -1 || !origin) {
+        // In produzione, controlliamo se l'origine è nella whitelist
+        callback(null, true);
+      } else {
+        callback(new Error('PERMESSO NEGATO - CORS'));
+      }
+    },
+    credentials: true // Permette l'invio di credenziali, come nel caso di autenticazione
+    // basata su sessioni.
+  };
 
 dotenv.config(); // Carica le variabili d'ambiente dal file .env
 
 const app = express(); // Crea l'applicazione Express
 
-// Configura CORS per permettere richieste dal frontend
-app.use(cors({
-    origin: 'http://localhost:5173', // L'URL del frontend
-    credentials: true // Abilita l'invio di credenziali (es. cookies) nelle richieste cross-origin
-  }));
+app.use(cors(corsOptions))
 app.use(express.json()); // Middleware per parsare il corpo delle richieste JSON
 
 // Configura la sessione

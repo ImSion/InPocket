@@ -170,7 +170,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       <p className="dark:text-gray-300 mb-4">{group.description}</p>
 
       {/* Membri del gruppo */}
-      <div className="mb-6">
+      <div className="mb-6 w-full md:w-[800px]">
         <h3 className="text-lg dark:text-white font-semibold mb-2">Membri del gruppo:</h3>
         <div className="flex flex-wrap gap-4">
           {group.members.map(member => (      

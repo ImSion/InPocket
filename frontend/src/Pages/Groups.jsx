@@ -80,7 +80,7 @@ export default function Groups({ userData }) {
 
   // Rendering del componente
   return (
-    <div className=" mx-auto p-4 min-h-screen">
+    <div className=" mx-auto p-4 min-h-screen flex flex-col items-center justify-center">
       <div className='flex flex-col items-center justify-center'>
       <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
       {/* Pulsante per creare un nuovo gruppo */}
@@ -90,7 +90,7 @@ export default function Groups({ userData }) {
 
       </div>
           
-      <div className='flex justify-between'>
+      <div className='flex justify-between w-full md:w-[800px]'>
         <div className='flex flex-col'>
           
 

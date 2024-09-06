@@ -50,7 +50,7 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTa
           className="mr-2"
           required
         />
-        <Button type="submit" color="blue">Aggiungi</Button>
+        <button type="submit" className='border dark:border-sky-500 text-black dark:text-white p-2 px-4 rounded-lg shadow-[inset_0px_0px_10px] shadow-white hover:shadow-[inset_0px_0px_20px] hover:shadow-white dark:hover:shadow-[inset_0px_0px_16px] dark:hover:shadow-sky-500 transition-all ease-in-out duration-500'>Aggiungi</button>
       </form>
       <ul>
         {tasks.map(task => (

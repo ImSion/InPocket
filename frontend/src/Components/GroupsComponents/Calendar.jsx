@@ -95,7 +95,7 @@ useEffect(() => {
 
   return (
     // Renderizza il contenitore del calendario
-    <div className='h-[500px]' ref={calendarRef}>                                        
+    <div className='h-[500px] w-[]' ref={calendarRef}>                                        
       <BigCalendar                                 // Renderizza il componente BigCalendar
         localizer={localizer}                      // Passa il localizzatore
         events={events}                            // Passa gli eventi

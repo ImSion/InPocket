@@ -47,7 +47,7 @@ export default function Nav({ userData }) {
                 <Avatar 
                   alt="User settings" 
                   img={profileImage}
-                  className="shadow-[0px_0px_8px]" 
+                  className="dark:shadow-[0px_0px_10px] dark:shadow-sky-600 dark:hover:shadow-[0px_0px_20px] hover:dark:shadow-sky-600 transition-all ease-in-out duration-500" 
                 />
               }
             >
