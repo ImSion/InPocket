@@ -86,12 +86,12 @@ export default function UserProfile({ userData, updateUserData }) {
   return (
       <div className='min-h-screen pt-20 '>
         <div className='p-3 py-10 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-black dark:bg-opacity-80 dark:shadow-[inset_0px_0px_20px] dark:shadow-sky-500 transition-all ease-in-out duration-500 dark:hover:shadow-[inset_0px_0px_25px] dark:hover:shadow-sky-500'>
-          <h1 className='text-center mb-3 dark:text-white'>Profilo Utente</h1>
+          <h1 className='text-center sm:text-2xl font-bold mb-3 dark:text-white'>Profilo Utente</h1>
           {editMode ? (
             <form className='flex flex-col justify-center items-center gap-2' onSubmit={handleSubmit}>
 
               {/* Avatar/img profilo */}
-              <div className='md:p-5 py-3 flex flex-col items-center justify-center mt-5 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500'>             
+              <div className='md:p-5 py-3 flex flex-col items-center justify-center mt-5 rounded-lg bg-transparent dark:text-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500'>             
                   <label className='text-xl mb-3'>Avatar: </label>
                   <input className='mb-3' type="file" name="avatar" onChange={handleAvatarChange} accept="image/*" />             
                 {avatarPreview && (
@@ -103,13 +103,13 @@ export default function UserProfile({ userData, updateUserData }) {
               <div className='flex flex-col sm:flex-row gap-2'>
                 <div className='flex flex-col items-center'>
                   <label>Nome</label>
-                  <input className='p-3 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
+                  <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
                    type="text" name="nome" value={formData.nome} onChange={handleChange}
                     />
                 </div>
                 <div className='flex flex-col items-center'>
                   <label>Cognome </label>
-                  <input className='p-3 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
+                  <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
                    type="text" name="cognome" value={formData.cognome} onChange={handleChange}
                     />
                 </div>
@@ -119,13 +119,13 @@ export default function UserProfile({ userData, updateUserData }) {
               <div className='flex flex-col sm:flex-row items-center gap-4'>
                 <div className='flex flex-col text-center'>
                   <label>Email: </label>
-                  <input className='p-3 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
+                  <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
                   type="email" name="email" value={formData.email} onChange={handleChange}
                    />
                 </div>
                 <div className='flex flex-col text-center'>
                   <label>Data di nascita: </label>
-                  <input className='p-3 rounded-lg bg-white bg-opacity-85 dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105' 
+                  <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105' 
                   type="date" name="data_di_nascita" value={formData.data_di_nascita} onChange={handleChange} 
                   />
                 </div>
