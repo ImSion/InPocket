@@ -108,7 +108,7 @@ export default function Register({ updateUserData }) {
         className="w-full max-w-md"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-3xl mb-6 text-center">Completa il tuo profilo</h1>
+        <h1 className="text-3xl mb-6 text-center dark:text-white">Completa il tuo profilo</h1>
 
         {/* Campo Nome */}
         <div className="mb-4">
@@ -119,7 +119,7 @@ export default function Register({ updateUserData }) {
             value={formData.nome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded fade-in-right"
           />
         </div>
 
@@ -132,7 +132,7 @@ export default function Register({ updateUserData }) {
             value={formData.cognome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded fade-in-left"
           />
         </div>
 
@@ -145,7 +145,7 @@ export default function Register({ updateUserData }) {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded fade-in-right"
           />
         </div>
 
@@ -157,14 +157,14 @@ export default function Register({ updateUserData }) {
             value={formData.data_di_nascita}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded fade-in-left"
           />
         </div>
 
         {/* Pulsante di invio */}
         <button 
           type="submit"
-          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="w-full p-2 bg-sky-500 text-white rounded hover:bg-sky-600 fade-in"
           disabled={isLoading}
         >
           {isLoading ? "Caricamento..." : "Completa profilo"}

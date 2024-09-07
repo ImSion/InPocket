@@ -35,7 +35,7 @@ export default function Notifications() {
         <div className="relative">
           <FaBell className="text-2xl mr-3 dark:text-gray-400" />
           {notifications.length > 0 && (
-            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+            <div className="absolute top-0 right-2 bg-red-500 text-white text-xs rounded-full border-2 h-4 w-4 flex items-center justify-center">
               {notifications.length}
             </div>
           )}

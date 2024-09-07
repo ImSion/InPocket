@@ -31,9 +31,9 @@ export default function Nav({ userData }) {
   return (
     <Navbar className="fixed w-full z-10 bottom-0 dark:bg-black" fluid>
       <NavbarBrand href="/home">
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">In</span>
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white" translate="no">In</span>
         <img src={logo} className="h-10 sm:h-9" alt="Logo InPocket" />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ocket</span>
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white" translate="no">ocket</span>
       </NavbarBrand>
       <div className="flex md:order-2 justify-center items-center">
         <DarkThemeToggle className="mr-3 hover:shadow-[inset_0px_0px_8px] dark:hover:shadow-amber-300 dark:hover:text-amber-300 hover:shadow-sky-800 hover:text-sky-800 hover:bg-transparent rounded-full border-2 border-slate-500 p-1 w-10 h-10 sm:h-10 sm:w-14 text-center justify-center flex items-center transition-all ease-in-out duration-500 hover:scale-105" />

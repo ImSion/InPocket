@@ -23,8 +23,8 @@ const InvitesList = ({ invites, onAccept, onReject }) => {
         <ul>
           {invites.map(invite => (
             <li key={invite._id} className="mb-2 p-2 border rounded">
-              <p>Gruppo: {invite.group.name}</p>
-              <p>Invitato da: {invite.invitedBy.nome} {invite.invitedBy.cognome}</p>
+              <p className='dark:text-white'>Gruppo: {invite.group.name}</p>
+              <p className='dark:text-white'>Invitato da: {invite.invitedBy.nome} {invite.invitedBy.cognome}</p>
               <div className="mt-2">
                 <button 
                   onClick={() => onAccept(invite._id)} 

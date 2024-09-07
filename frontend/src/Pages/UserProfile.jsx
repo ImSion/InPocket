@@ -95,7 +95,7 @@ export default function UserProfile({ userData, updateUserData }) {
                   <label className='text-xl mb-3'>Avatar: </label>
                   <input className='mb-3' type="file" name="avatar" onChange={handleAvatarChange} accept="image/*" />             
                 {avatarPreview && (
-                  <img src={avatarPreview} alt="Avatar Preview" className='w-[90%] md:w-[600px] md:h-[280px]' />
+                  <img src={avatarPreview} alt="Avatar Preview" className='w-[90%] md:w-[600px] md:h-[full]' />
                 )}
               </div>
 
@@ -135,20 +135,20 @@ export default function UserProfile({ userData, updateUserData }) {
               <button className='border border-red-500 p-3 w-[138px] rounded-lg shadow-[inset_0px_0px_10px] shadow-red-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-red-500 transition-all ease-in-out duration-500 hover:scale-105' type="button" onClick={() => setEditMode(false)}>Annulla</button>
             </form>
           ) : (
-            <div className='flex flex-col justify-center items-center gap-2 dark:text-white'>
-              <img src={formData.avatar} alt="Avatar" className='w-[99%] h-72 sm:w-80' />
+            <div className='flex justify-center items-center gap-2 dark:text-white'>
+              <img src={formData.avatar} alt="Avatar" className='w-[99%] h-72 sm:w-80 rounded-lg' />
 
-              <div className='flex gap-4'>
-                <p>Nome: {formData.nome}</p>
-                <p>Cognome: {formData.cognome}</p>
-              </div>
+               <div className='flex flex-col fade-in-right'>
+                  <p>Nome: {formData.nome}</p>
+                  <p>Cognome: {formData.cognome}</p>
+  
+                  <p>Email: {formData.email}</p>
+                  <p>Data di nascita: {formData.data_di_nascita}</p>
 
-              <div className='flex gap-4'>
-                <p>Email: {formData.email}</p>
-                <p>Data di nascita: {formData.data_di_nascita}</p>
               </div>
 
               <button className='border border-sky-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-sky-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-sky-500 transition-all ease-in-out duration-500' onClick={() => setEditMode(true)}>Modifica profilo</button>
+
             </div>
           )}
         </div>    
