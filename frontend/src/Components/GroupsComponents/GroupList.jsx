@@ -1,20 +1,24 @@
 import React from 'react';
+import { Dropdown } from 'flowbite-react';
 
 export default function GroupList({ groups, onSelectGroup }) {
   return (
-    <div className="w-1/3 pr-4">
-      <h2 className="text-xl font-semibold mb-2 dark:text-white">Elenco Gruppi</h2>
-      <ul>
-        {groups.map(group => (
-          <li 
-            key={group._id}
-            onClick={() => onSelectGroup(group)}
-            className="cursor-pointer hover:bg-gray-100 dark:hover:bg-cyan-600 p-2 rounded dark:text-white"
-          >
-            {group.name}
-          </li>
-        ))}
-      </ul>
+    <div className="mb-4">
+      <Dropdown label="Elenco Gruppi" className="w-72" arrowIcon={false}>
+        {groups.length === 0 ? (
+          <Dropdown.Item>Nessun gruppo disponibile</Dropdown.Item>
+        ) : (
+          groups.map(group => (
+            <Dropdown.Item 
+              key={group._id}
+              onClick={() => onSelectGroup(group)}
+              className='fade-in-right'
+            >
+              {group.name}
+            </Dropdown.Item>
+          ))
+        )}
+      </Dropdown>
     </div>
   );
 }

@@ -211,16 +211,16 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
 
       <div className='flex justify-center'>
         <button onClick={() => setShowInviteForm(true)} 
-        className="mt-4 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-emerald-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-emerald-600 hover:shadow-[inset_0px_0px_16px] hover:shadow-emerald-400 transition-all ease-in-out duration-500">
+        className="mt-4 fade-in h-10 flex justify-center items-center px-4 py-6 dark:text-white border border-emerald-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-emerald-600 hover:shadow-[inset_0px_0px_16px] hover:shadow-emerald-400 transition-all ease-in-out duration-500 hover:scale-105">
           Invita Utente
         </button>
         {isCreator ? (
           <button onClick={() => setShowDeleteModal(true)} 
-          className="mt-4 ml-2 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-red-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-red-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-red-700 transition-all ease-in-out duration-500">
+          className="mt-4 ml-2 fade-in h-10 flex justify-center items-center px-4 py-6 dark:text-white border border-red-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-red-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-red-700 transition-all ease-in-out duration-500">
             Elimina Gruppo
           </button>
         ) : (
-          <button onClick={handleLeaveGroup} className="mt-4 ml-2 fade-in h-10 flex justify-center items-center p-2 py-5 dark:text-white border border-yellow-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-yellow-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-yellow-700 transition-all ease-in-out duration-500">
+          <button onClick={handleLeaveGroup} className="mt-4 ml-2 fade-in h-10 flex justify-center items-center px-4 py-6 dark:text-white border border-cyan-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-cyan-600 hover:shadow-[inset_0px_0px_16px] hover:shadow-cyan-400 transition-all ease-in-out duration-500 hover:scale-105">
             Abbandona Gruppo
           </button>
         )}
@@ -244,16 +244,16 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
           }}
         />
         </div>
-        <div className="w-full">
-        <TaskList 
-      tasks={group.tasks.filter(task => 
-        new Date(task.scheduledDate).toDateString() === selectedDate.toDateString()
-      )}
-      onCreateTask={(taskData) => handleCreateTask({...taskData, scheduledDate: selectedDate})}
-      onUpdateTask={handleUpdateTask}
-      onDeleteTask={handleDeleteTask}
-      selectedDate={selectedDate}
-    />
+        <div className="w-62">
+          <TaskList 
+            tasks={group.tasks.filter(task => 
+              new Date(task.scheduledDate).toDateString() === selectedDate.toDateString()
+            )}
+            onCreateTask={(taskData) => handleCreateTask({...taskData, scheduledDate: selectedDate})}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            selectedDate={selectedDate}
+          />
         </div>
       </div>
       

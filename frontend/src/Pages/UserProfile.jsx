@@ -100,7 +100,7 @@ export default function UserProfile({ userData, updateUserData }) {
               </div>
 
               {/* nome e cognome */}
-              <div className='flex flex-col sm:flex-row gap-2'>
+              <div className='flex flex-col sm:flex-row gap-4'>
                 <div className='flex flex-col items-center'>
                   <label>Nome</label>
                   <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105'
@@ -125,29 +125,37 @@ export default function UserProfile({ userData, updateUserData }) {
                 </div>
                 <div className='flex flex-col text-center'>
                   <label>Data di nascita: </label>
-                  <input className='p-3 rounded-lg bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105' 
+                  <input className='p-3 rounded-lg w-52 bg-white shadow-[inset_0px_0px_10px] hover:shadow-[inset_0px_0px_16px] dark:text-white dark:border-sky-500 dark:bg-transparent dark:shadow-[inset_0px_0px_10px] dark:shadow-sky-500 transition-all ease-in-out duration-500 cursor-pointer dark:hover:shadow-[inset_0px_0px_18px] dark:hover:shadow-sky-500 hover:scale-105' 
                   type="date" name="data_di_nascita" value={formData.data_di_nascita} onChange={handleChange} 
                   />
                 </div>
               </div>
 
-              <button className='border border-emerald-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-emerald-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-emerald-500 transition-all ease-in-out duration-500 hover:scale-105' type="submit">Salva modifiche</button>
-              <button className='border border-red-500 p-3 w-[138px] rounded-lg shadow-[inset_0px_0px_10px] shadow-red-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-red-500 transition-all ease-in-out duration-500 hover:scale-105' type="button" onClick={() => setEditMode(false)}>Annulla</button>
-            </form>
-          ) : (
-            <div className='flex justify-center items-center gap-2 dark:text-white'>
-              <img src={formData.avatar} alt="Avatar" className='w-[99%] h-72 sm:w-80 rounded-lg' />
-
-               <div className='flex flex-col fade-in-right'>
-                  <p>Nome: {formData.nome}</p>
-                  <p>Cognome: {formData.cognome}</p>
-  
-                  <p>Email: {formData.email}</p>
-                  <p>Data di nascita: {formData.data_di_nascita}</p>
-
+              <div className='flex items-center justify-center gap-2 mt-4'>
+                <button className='border border-emerald-500 p-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-emerald-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-emerald-500 transition-all ease-in-out duration-500 hover:scale-105' type="submit">Salva modifiche</button>
+                <button className='border border-red-500 p-3 w-[138px] rounded-lg shadow-[inset_0px_0px_10px] shadow-red-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-red-500 transition-all ease-in-out duration-500 hover:scale-105' type="button" onClick={() => setEditMode(false)}>Annulla</button>
               </div>
 
-              <button className='border border-sky-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-sky-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-sky-500 transition-all ease-in-out duration-500' onClick={() => setEditMode(true)}>Modifica profilo</button>
+            </form>
+          ) : (
+            <div className='flex flex-col justify-center items-center gap-2 dark:text-white'>
+              <div className='flex flex-col lg:flex-row gap-1 items-center justify-center '>
+
+                <img src={formData.avatar} alt="Avatar" className='w-[99%] h-full sm:max-w-[600px] rounded-lg' />
+  
+                <div className='flex flex-col mt-2'>
+                  
+                  <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top border mb-2 p-3'>Nome: {formData.nome}</p>
+                  <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-1 border mb-2 p-3'>Cognome: {formData.cognome}</p>
+    
+                  <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-2 border mb-2 p-3'>Email: {formData.email}</p>
+                  <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-3 border mb-2 p-3'>Data di nascita: {formData.data_di_nascita}</p>
+  
+                </div>
+
+              </div>
+                <button className='border border-sky-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-sky-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-sky-500 transition-all ease-in-out duration-500' onClick={() => setEditMode(true)}>Modifica profilo</button>
+
 
             </div>
           )}

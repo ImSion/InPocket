@@ -95,7 +95,7 @@ useEffect(() => {
 
   return (
     // Renderizza il contenitore del calendario
-    <div className='h-[500px] w-[]' ref={calendarRef}>                                        
+    <div className='h-[500px] w-[330px]' ref={calendarRef}>                                        
       <BigCalendar                                 // Renderizza il componente BigCalendar
         localizer={localizer}                      // Passa il localizzatore
         events={events}                            // Passa gli eventi
@@ -105,7 +105,7 @@ useEffect(() => {
         onSelectEvent={handleSelectEvent}          // Gestisce la selezione di un evento
         selectable={true}                          // Permette la selezione di slot
         longPressThreshold={10}                    // Imposta la soglia per il press lungo
-        views={['month', 'week', 'day']}
+        views={['month']}
         messages={messages}                        // Passa le traduzioni
         formats={formats}                          // Passa i formati personalizzati
         culture='it'                               // Imposta la cultura (lingua)

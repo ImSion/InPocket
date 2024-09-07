@@ -1,6 +1,5 @@
 /* MainCSS.css */
 
-
 .fade-in {
   animation: fadeIn 1.5s ease-in;
 }
@@ -28,6 +27,20 @@
   animation: fadeInFromRight 1.5s ease-out forwards;
 }
 
+.fade-in-top {
+  animation: fadeInFromTop 1.5s ease-out forwards;
+}
+
+.fade-in-bottom {
+  animation: fadeInFromBottom 1.5s ease-out forwards;
+}
+
+/* ritardi per creare effetti build up */
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+.delay-4 { animation-delay: 0.8s; }
+
 .shdw {
   box-shadow: 0px 0px 5px green;
 }
@@ -48,6 +61,29 @@
   animation: shake 0.8s ease-in-out;
 }
 
+/* Animazione per la dissolvenza in entrata dall'alto */
+@keyframes fadeInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animazione per la dissolvenza in entrata dal basso */
+@keyframes fadeInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Animazione per la dissolvenza in entrata */
 @keyframes fadeIn {

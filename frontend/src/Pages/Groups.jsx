@@ -82,15 +82,15 @@ export default function Groups({ userData }) {
   return (
     <div className=" mx-auto p-4 min-h-screen flex flex-col items-center justify-center">
       <div className='flex flex-col items-center justify-center'>
-      <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
-      {/* Pulsante per creare un nuovo gruppo */}
-          <button onClick={() => setShowCreateForm(true)} className="bg-cyan-500 h-10 text-white px-4 py-2 rounded mb-4">
-            Crea Nuovo Gruppo
-          </button>
-
+        <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
+        {/* Pulsante per creare un nuovo gruppo */}
+           <button onClick={() => setShowCreateForm(true)} className="bg-cyan-500 h-10 text-white px-4 py-2 rounded mb-4">
+             Crea Nuovo Gruppo
+           </button>
+ 
       </div>
           
-      <div className='flex justify-between w-full md:w-[800px]'>
+      <div className='flex flex-col items-center md:flex-row justify-around w-full md:w-[800px]'>
         <div className='flex flex-col'>
           
 

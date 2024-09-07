@@ -105,7 +105,7 @@ export default function Register({ updateUserData }) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <form 
-        className="w-full max-w-md"
+        className="w-full fade-in max-w-md border border-sky-500 p-3 py-8 shadow-[inset_0px_0px_15px] shadow-sky-500 rounded-xl"
         onSubmit={handleSubmit}
       >
         <h1 className="text-3xl mb-6 text-center dark:text-white">Completa il tuo profilo</h1>
@@ -119,7 +119,7 @@ export default function Register({ updateUserData }) {
             value={formData.nome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-right"
+            className="w-full p-2 border rounded fade-in-top"
           />
         </div>
 
@@ -132,7 +132,7 @@ export default function Register({ updateUserData }) {
             value={formData.cognome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-left"
+            className="w-full p-2 border rounded fade-in-top delay-1"
           />
         </div>
 
@@ -145,7 +145,7 @@ export default function Register({ updateUserData }) {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-right"
+            className="w-full p-2 border rounded fade-in-top delay-2"
           />
         </div>
 
@@ -157,14 +157,14 @@ export default function Register({ updateUserData }) {
             value={formData.data_di_nascita}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-left"
+            className="w-full p-2 border rounded fade-in-top delay-3"
           />
         </div>
 
         {/* Pulsante di invio */}
         <button 
           type="submit"
-          className="w-full p-2 bg-sky-500 text-white rounded hover:bg-sky-600 fade-in"
+          className="w-full p-2 bg-sky-500 text-white rounded hover:bg-sky-600 fade-in-bottom"
           disabled={isLoading}
         >
           {isLoading ? "Caricamento..." : "Completa profilo"}

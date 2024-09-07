@@ -36,7 +36,7 @@ export default function Home({ userData: propUserData }) {
           }, 4000); // Inizia a chiudersi dopo 4 secondi
         }
       },
-      { threshold: 0.5 } // Si attiva quando il 50% del button è visibile
+      { threshold: 0.9 } // Si attiva quando il 90% del button è visibile
     );
 
     if (buttonRef.current) {
@@ -194,7 +194,7 @@ export default function Home({ userData: propUserData }) {
     return (
       <div className="flex flex-col sm:justify-between md:flex-row w-full">
         {/* Legenda Annuale (sinistra) */}
-        <div className="flex items-center justify-center ml-4">
+        <div className="flex items-center justify-center md:ml-4 fade-in-top z-10">
           <CustomPieLegend data={pieDataAnnuale} title="Legenda Annuale" />
         </div>
   
@@ -258,7 +258,7 @@ export default function Home({ userData: propUserData }) {
         </div>
   
         {/* Legenda Mensile (destra) */}
-        <div className='flex flex-col items-center justify-center mr-4'>
+        <div className='flex flex-col items-center justify-center md:mr-4 fade-in-bottom z-10'>
           <CustomPieLegend data={pieDataMensile} title="Legenda Mensile" />
         </div>
       </div>
@@ -553,13 +553,13 @@ export default function Home({ userData: propUserData }) {
         <div ref={buttonRef} className="sm:absolute sm:top-3 sm:left-3 flex mb-2 items-center justify-center">
           <button 
             onClick={() => handleOpenModal()} 
-            className="flex items-center border-2 border-emerald-600 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-1000 hover:scale-105 overflow-hidden"
+            className="flex items-center border-2 border-emerald-600 shadow-[inset_0px_0px_8px] shadow-emerald-500 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-1000 hover:scale-105 overflow-hidden"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500 flex-shrink-0">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             <span className={`text-emerald-500 whitespace-nowrap transition-all duration-1000 ease-in-out ${
-              isButtonExpanded ? 'max-w-[200px] opacity-100 ml-1 mr-2' : 'max-w-0 opacity-0'
+              isButtonExpanded ? 'max-w-[200px] opacity-100 ml-1 mr-2 ' : 'max-w-0 opacity-0'
             }`}>
               Aggiungi transazione
             </span>
