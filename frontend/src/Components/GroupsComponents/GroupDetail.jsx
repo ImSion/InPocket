@@ -165,7 +165,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   }; 
 
   return (
-    <div className="w-full">
+    <div className="w-[90%]">
       <h2 className="text-xl dark:text-white font-semibold mb-2">Gruppo: {group.name}</h2>
       <p className="dark:text-gray-300 mb-4">{group.description}</p>
 
@@ -244,7 +244,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
           }}
         />
         </div>
-        <div className="w-62">
+        <div>
           <TaskList 
             tasks={group.tasks.filter(task => 
               new Date(task.scheduledDate).toDateString() === selectedDate.toDateString()
