@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';  // Importa React e gli hooks necessari
+import React, { useState, useEffect, useRef } from 'react';  // Importa React e gli hooks necessari
 import { useAuth0 } from "@auth0/auth0-react";  // Importa hook per Auth0
 import { Button, Card, Modal, Dropdown } from 'flowbite-react';  // Importa componenti UI da Flowbite
 import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';  // Importa componenti per i grafici
@@ -21,7 +21,35 @@ export default function Home({ userData: propUserData }) {
   const [transactionToDelete, setTransactionToDelete] = useState(null);  // Stato per la transazione da eliminare
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);  // Stato per la transazione selezionata
   const [showAllTransactions, setShowAllTransactions] = useState(false); // Stato per il modale del totale delle transazioni
-  
+  const [isButtonExpanded, setIsButtonExpanded] = useState(false); // Stato per l'apertura del button per l'aggiunta transazioni
+  const buttonRef = useRef(null);
+
+
+  //Effetto per l'espansione del button aggiungi transazione
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsButtonExpanded(true);
+          setTimeout(() => {
+            setIsButtonExpanded(false);
+          }, 4000); // Inizia a chiudersi dopo 4 secondi
+        }
+      },
+      { threshold: 0.5 } // Si attiva quando il 50% del button è visibile
+    );
+
+    if (buttonRef.current) {
+      observer.observe(buttonRef.current);
+    }
+
+    return () => {
+      if (buttonRef.current) {
+        observer.unobserve(buttonRef.current);
+      }
+    };
+  }, []);
+
   // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
     setUserData(propUserData);
@@ -220,7 +248,7 @@ export default function Home({ userData: propUserData }) {
                 <Tooltip />
               </PieChart>
               <div className="absolute w-36 flex flex-col justify-center items-center top-[105px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <div className="font-bold dark:text-white">Saldo Mensile</div>
+                <div className="font-bold dark:text-white" translate='no'>Saldo Mensile</div>
                 <div className={saldoMensile >= 0 ? "text-green-500" : "text-red-500"}>
                   €{saldoMensile.toFixed(2)}
                 </div>
@@ -439,10 +467,10 @@ export default function Home({ userData: propUserData }) {
     <div className='xl:flex xl:flex-col xl:items-center'>
       {/* Header con benvenuto e titolo dashboard */}
       <div className='flex justify-between xl:w-[1200px]'>
-        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake">
+        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake" translate='no'>
           Bentornato, {userData?.nome || user.name}
         </h1>
-        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg shake">
+        <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg shake" translate='no'>
           Dashboard
         </h1>
       </div>
@@ -519,16 +547,25 @@ export default function Home({ userData: propUserData }) {
       
       {/* Lista delle transazioni recenti */}
       <div className='flex relative dark:shadow-cyan-800 border-2 dark:border-cyan-500 flex-col xl:w-[1200px] justify-center p-1 rounded-lg shadow-md bg-white bg-opacity-70 dark:bg-sky-950 dark:bg-opacity-90'>
+
+        <h2 className="text-xl font-semibold mb-6 mt-4 dark:text-white text-center">Transazioni Recenti</h2>
         {/* Pulsante per aggiungere una nuova transazione */}
-        <div className="absolute top-3 left-3">
-          <button onClick={() => handleOpenModal()} className='border-2 border-emerald-600 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-500 hover:scale-105'>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500">
+        <div ref={buttonRef} className="sm:absolute sm:top-3 sm:left-3 flex mb-2 items-center justify-center">
+          <button 
+            onClick={() => handleOpenModal()} 
+            className="flex items-center border-2 border-emerald-600 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-1000 hover:scale-105 overflow-hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500 flex-shrink-0">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
+            <span className={`text-emerald-500 whitespace-nowrap transition-all duration-1000 ease-in-out ${
+              isButtonExpanded ? 'max-w-[200px] opacity-100 ml-1 mr-2' : 'max-w-0 opacity-0'
+            }`}>
+              Aggiungi transazione
+            </span>
           </button>
         </div>
 
-        <h2 className="text-xl font-semibold mb-6 mt-4 dark:text-white text-center">Transazioni Recenti</h2>
         <div className="sm:flex sm:gap-4 border-t-2 border-black dark:border-cyan-500">
           {/* Lista delle prime 10 transazioni */}
           <ul className="w-full sm:w-1/2 mt-3">
