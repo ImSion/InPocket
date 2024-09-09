@@ -36,15 +36,15 @@ export default function AllTransactionsModal({ show, onClose, transactions }) {
   }, { entrate: 0, uscite: 0 });
 
   return (
-    <Modal show={show} onClose={onClose} size="xl">
-      <Modal.Header>Tutte le Transazioni</Modal.Header>
-      <Modal.Body>
+    <Modal show={show} onClose={onClose} size="xl" className=''>
+      <Modal.Header className='dark:bg-sky-950'>Tutte le Transazioni</Modal.Header>
+      <Modal.Body className='dark:bg-sky-950'>
         <div className="flex justify-between mb-4">
           <Button onClick={() => navigateMonth(-1)}>Indietro</Button>
-          <h2>{currentMonth.format('MMMM YYYY')}</h2>
+          <h2 className='dark:text-white text-xl items-center justify-center flex'>{currentMonth.format('MMMM YYYY')}</h2>
           <Button onClick={() => navigateMonth(1)}>Avanti</Button>
         </div>
-        <ul className="mb-4">
+        <ul className="mb-4 dark:text-white ">
           {currentTransactions.map((transaction, index) => (
             <li key={index} className="mb-2 p-2 border-b">
               <div className="flex justify-between">
@@ -64,23 +64,23 @@ export default function AllTransactionsModal({ show, onClose, transactions }) {
         ) : (
           <div className="border-t pt-4">
             <div className="flex justify-between font-bold">
-              <span>Totale Entrate:</span>
+              <span className='dark:text-white'>Totale Entrate:</span>
               <span className="text-green-500">€{totals.entrate.toFixed(2)}</span>
             </div>
             <div className="flex justify-between font-bold mt-2">
-              <span>Totale Uscite:</span>
+              <span className='dark:text-white'>Totale Uscite:</span>
               <span className="text-red-500">€{totals.uscite.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between font-bold mt-2 text-lg">
+            <div className="flex justify-between items-center font-bold mt-2 text-lg dark:text-white">
               <span>Bilancio:</span>
-              <span className={totals.entrate - totals.uscite >= 0 ? 'text-green-500' : 'text-red-500'}>
+              <span className={totals.entrate - totals.uscite >= 0 ? 'text-green-500 p-2 rounded-full shadow-[inset_0px_0px_10px] dark:shadow-green-500' : 'text-red-500 p-2 rounded-full shadow-[inset_0px_0px_10px] dark:shadow-red-500'}>
                 €{(totals.entrate - totals.uscite).toFixed(2)}
               </span>
             </div>
           </div>
         )}
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className='dark:bg-sky-950'>
         <Button onClick={onClose}>Chiudi</Button>
       </Modal.Footer>
     </Modal>

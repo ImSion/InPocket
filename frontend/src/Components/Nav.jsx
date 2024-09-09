@@ -29,7 +29,7 @@ export default function Nav({ userData }) {
   const profileImage = userData?.avatar || user?.picture;
 
   return (
-    <Navbar className="fixed w-full z-10 bottom-0 dark:bg-black" fluid>
+    <Navbar className="fixed w-full z-30 bottom-0 dark:bg-black" fluid>
       <NavbarBrand href="/home">
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white" translate="no">In</span>
         <img src={logo} className="h-10 sm:h-9" alt="Logo InPocket" />
@@ -50,8 +50,8 @@ export default function Nav({ userData }) {
                   className="dark:shadow-[0px_0px_10px] dark:shadow-sky-600 dark:hover:shadow-[0px_0px_20px] hover:dark:shadow-sky-600 transition-all ease-in-out duration-500" 
                 />
               }
-            >
-              <DropdownHeader className="z-10">
+              >
+              <DropdownHeader>
                 <span className="block truncate text-sm font-medium">
                   {userData?.email || user.email || 'Email non disponibile'}
                 </span>

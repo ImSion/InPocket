@@ -111,7 +111,8 @@ export default function Register({ updateUserData }) {
         <h1 className="text-3xl mb-6 text-center dark:text-white">Completa il tuo profilo</h1>
 
         {/* Campo Nome */}
-        <div className="mb-4">
+        <div className="mb-4 fade-in-top">
+          <p className='dark:text-white'>Nome</p>
           <input 
             name="nome" 
             type="text" 
@@ -119,12 +120,13 @@ export default function Register({ updateUserData }) {
             value={formData.nome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-top"
+            className="w-full p-2 border rounded-lg"
           />
         </div>
 
         {/* Campo Cognome */}
-        <div className="mb-4">
+        <div className="mb-4 fade-in-top delay-2">
+          <p className='dark:text-white'>Cognome</p>
           <input 
             name="cognome" 
             type="text" 
@@ -132,12 +134,13 @@ export default function Register({ updateUserData }) {
             value={formData.cognome}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-top delay-1"
+            className="w-full p-2 border rounded-lg"
           />
         </div>
 
         {/* Campo Email */}
-        <div className="mb-4">
+        <div className="mb-4 fade-in-top delay-3">
+          <p className='dark:text-white'>Email</p>
           <input 
             name="email" 
             type="email" 
@@ -145,26 +148,27 @@ export default function Register({ updateUserData }) {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-top delay-2"
+            className="w-full p-2 border rounded-lg"
           />
         </div>
 
         {/* Campo Data di Nascita */}
-        <div className="mb-6">
+        <div className="mb-6 fade-in-top delay-4">
+          <p className='dark:text-white'>Data di nascita</p>
           <input 
             name="data_di_nascita" 
             type="date" 
             value={formData.data_di_nascita}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded fade-in-top delay-3"
+            className="w-full p-2 border rounded-lg"
           />
         </div>
 
         {/* Pulsante di invio */}
         <button 
           type="submit"
-          className="w-full p-2 bg-sky-500 text-white rounded hover:bg-sky-600 fade-in-bottom"
+          className="w-full p-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 fade-in-bottom"
           disabled={isLoading}
         >
           {isLoading ? "Caricamento..." : "Completa profilo"}

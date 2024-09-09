@@ -165,33 +165,37 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   }; 
 
   return (
-    <div className="w-[90%]">
+    <div className="w-full">
       <h2 className="text-xl dark:text-white font-semibold mb-2">Gruppo: {group.name}</h2>
       <p className="dark:text-gray-300 mb-4">{group.description}</p>
 
       {/* Membri del gruppo */}
       <div className="mb-6 w-full md:w-[800px]">
         <h3 className="text-lg dark:text-white font-semibold mb-2">Membri del gruppo:</h3>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-col sm:flex-row gap-2">
           {group.members.map(member => (      
-            <div key={member._id} className="flex flex-col items-center">
-              <Avatar
-                onClick={() => handleMemberClick(member)} 
-                img={member.avatar || "https://via.placeholder.com/150"} 
-                alt={`${member.nome} ${member.cognome}`}
-                size="lg"
-                className='cursor-pointer' 
-                rounded
-              />
+            <div key={member._id} className="flex mr-3 sm:flex-col items-start sm:items-center rounded-lg">
+            <img
+              src={member.avatar || member.picture || (member.user && member.user.avatar) || "https://via.placeholder.com/150"}
+              alt={`${member.nome || member.name || (member.user && member.user.nome) || 'User'} ${member.cognome || member.surname || (member.user && member.user.cognome) || ''}`}
+              onClick={() => handleMemberClick(member)}
+              className="w-16 h-16 sm:w-20 sm:h-20 hover:scale-105 transition-all ease-in-out duration-500 rounded-lg shadow-[0px_0px_10px] mb-1 sm:rounded-full object-cover cursor-pointer"
+              onError={(e) => {
+                console.error("Errore nel caricamento dell'avatar:", e);
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/150";
+              }}
+            />
+            <div className="flex flex-col items-center">
               <button 
                 onClick={() => handleMemberClick(member)}
-                className="mt-2 text-sm dark:text-white hover:underline"
+                className="text-lg ml-4 mt-4 text-center dark:text-white transition-all ease-in-out duration-500 hover:scale-105"
               >
                 {member.nome} {member.cognome}
               </button>
               {selectedMember === member && (
                 <div className="mt-2 text-xs dark:text-gray-300">
-                  <p>{member.email}</p>
+                  <p className='text-sm'>{member.email}</p>
                   {isCreator && member._id !== userData._id && (
                     <Button 
                       color="failure" 
@@ -205,6 +209,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
                 </div>
               )}
             </div>
+          </div>
           ))}
         </div>
       </div>
@@ -216,7 +221,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         </button>
         {isCreator ? (
           <button onClick={() => setShowDeleteModal(true)} 
-          className="mt-4 ml-2 fade-in h-10 flex justify-center items-center px-4 py-6 dark:text-white border border-red-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-red-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-red-700 transition-all ease-in-out duration-500">
+          className="mt-4 ml-2 fade-in h-10 flex justify-center items-center px-4 py-6 dark:text-white border border-red-500 rounded-lg shadow-[inset_0px_0px_12px] shadow-red-600 hover:shadow-[inset_0px_0px_20px] hover:shadow-red-700 transition-all ease-in-out duration-500 hover:scale-105">
             Elimina Gruppo
           </button>
         ) : (
@@ -235,7 +240,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
       )}
       
       <div className="flex flex-col justify-center items-center mt-4">
-        <div className="w-full fade-in">
+        <div className="w-full fade-in flex items-center justify-center">
         <Calendar 
           tasks={group.tasks} 
           onSelectDate={(date) => {

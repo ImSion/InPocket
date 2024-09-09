@@ -39,7 +39,7 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTa
   };
 
   return (
-    <div>
+    <div className='flex flex-col items-center justify-center'>
       <h3 className="text-lg dark:text-white font-semibold mt-4 mb-2">Tasks per {selectedDate.toLocaleDateString()}</h3>
       <form onSubmit={handleCreateTask} className="mb-4 flex">
         <TextInput
@@ -47,10 +47,10 @@ export default function TaskList({ tasks, onCreateTask, onUpdateTask, onDeleteTa
           placeholder="Nuovo task"
           value={newTaskDescription}
           onChange={(e) => setNewTaskDescription(e.target.value)}
-          className="mr-2"
+          className="mr-2 w-[220px] rounded-lg bg-white bg-opacity-30"
           required
         />
-        <button type="submit" className='border dark:border-sky-500 text-black dark:text-white p-2 px-4 rounded-lg shadow-[inset_0px_0px_10px] shadow-white hover:shadow-[inset_0px_0px_20px] hover:shadow-white dark:hover:shadow-[inset_0px_0px_16px] dark:hover:shadow-sky-500 transition-all ease-in-out duration-500'>Aggiungi</button>
+        <button type="submit" className='border dark:border-white text-black dark:text-white p-2 px-4 rounded-lg shadow-[inset_0px_0px_10px] shadow-white hover:shadow-[inset_0px_0px_20px] hover:shadow-white dark:hover:shadow-[inset_0px_0px_16px] dark:hover:shadow-sky-500 transition-all ease-in-out duration-500'>Aggiungi</button>
       </form>
       <ul>
         {tasks.map(task => (

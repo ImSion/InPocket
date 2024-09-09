@@ -28,7 +28,7 @@ import {
 
               
             </div>
-            <div className="grid grid-cols-2 gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
+            <div className="sm:grid flex gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
               <div>
                 <FooterTitle title="about" translate="no"/>
                 <FooterLinkGroup col>

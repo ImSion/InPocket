@@ -23,32 +23,34 @@ export default function Home({ userData: propUserData }) {
   const [showAllTransactions, setShowAllTransactions] = useState(false); // Stato per il modale del totale delle transazioni
   const [isButtonExpanded, setIsButtonExpanded] = useState(false); // Stato per l'apertura del button per l'aggiunta transazioni
   const buttonRef = useRef(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
 
   //Effetto per l'espansione del button aggiungi transazione
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !hasAnimated) {
           setIsButtonExpanded(true);
+          setHasAnimated(true);
           setTimeout(() => {
             setIsButtonExpanded(false);
-          }, 4000); // Inizia a chiudersi dopo 4 secondi
+          }, 4000);
         }
       },
-      { threshold: 0.9 } // Si attiva quando il 90% del button è visibile
+      { threshold: 0.9 }
     );
-
+  
     if (buttonRef.current) {
       observer.observe(buttonRef.current);
     }
-
+  
     return () => {
       if (buttonRef.current) {
         observer.unobserve(buttonRef.current);
       }
     };
-  }, []);
+  }, [hasAnimated]);
 
   // Effetto per aggiornare userData quando propUserData cambia
   useEffect(() => {
@@ -345,18 +347,24 @@ export default function Home({ userData: propUserData }) {
   // Funzione per preparare i dati per il grafico a linee
   const prepareChartData = () => {
     const data = {};
-    transactions.forEach(t => {
+    let cumulativeEntrate = 0;
+    let cumulativeUscite = 0;
+    
+    transactions.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(t => {
       const date = new Date(t.data).toLocaleDateString();
       if (!data[date]) {
-        data[date] = { date, entrate: 0, uscite: 0 };
+        data[date] = { date, entrate: cumulativeEntrate, uscite: cumulativeUscite };
       }
       if (t.tipo === 'entrata') {
-        data[date].entrate += parseFloat(t.importo);
+        cumulativeEntrate += parseFloat(t.importo);
+        data[date].entrate = cumulativeEntrate;
       } else {
-        data[date].uscite += parseFloat(t.importo);
+        cumulativeUscite += parseFloat(t.importo);
+        data[date].uscite = cumulativeUscite;
       }
     });
-    return Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    return Object.values(data);
   };
 
   const { categoryColorMap } = pieFinancialData();
@@ -551,19 +559,19 @@ export default function Home({ userData: propUserData }) {
         <h2 className="text-xl font-semibold mb-6 mt-4 dark:text-white text-center">Transazioni Recenti</h2>
         {/* Pulsante per aggiungere una nuova transazione */}
         <div ref={buttonRef} className="sm:absolute sm:top-3 sm:left-3 flex mb-2 items-center justify-center">
-          <button 
-            onClick={() => handleOpenModal()} 
-            className="flex items-center border-2 border-emerald-600 shadow-[inset_0px_0px_8px] shadow-emerald-500 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-1000 hover:scale-105 overflow-hidden"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500 flex-shrink-0">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            <span className={`text-emerald-500 whitespace-nowrap transition-all duration-1000 ease-in-out ${
-              isButtonExpanded ? 'max-w-[200px] opacity-100 ml-1 mr-2 ' : 'max-w-0 opacity-0'
-            }`}>
-              Aggiungi transazione
-            </span>
-          </button>
+        <button 
+          onClick={() => handleOpenModal()} 
+          className="flex items-center border-2 border-emerald-600 shadow-[inset_0px_0px_8px] shadow-emerald-500 rounded-full hover:shadow-[inset_0px_0px_8px] hover:shadow-emerald-600 transition-all ease-in-out duration-1000 hover:scale-105 overflow-hidden"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-emerald-500 flex-shrink-0">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          <span className={`text-emerald-500 whitespace-nowrap transition-all duration-1000 ease-in-out ${
+            isButtonExpanded ? 'max-w-[200px] opacity-100 ml-1 mr-2 ' : 'max-w-0 opacity-0'
+          }`}>
+            Aggiungi transazione
+          </span>
+        </button>
         </div>
 
         <div className="sm:flex sm:gap-4 border-t-2 border-black dark:border-cyan-500">
