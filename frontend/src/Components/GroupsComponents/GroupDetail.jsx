@@ -189,12 +189,12 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
             <div className="flex flex-col items-center">
               <button 
                 onClick={() => handleMemberClick(member)}
-                className="text-lg ml-4 mt-4 text-center dark:text-white transition-all ease-in-out duration-500 hover:scale-105"
+                className="text-lg ml-4 mt-4 sm:mt-1 sm:ml-0 text-center dark:text-white transition-all ease-in-out duration-500 hover:scale-105"
               >
                 {member.nome} {member.cognome}
               </button>
               {selectedMember === member && (
-                <div className="mt-2 text-xs dark:text-gray-300">
+                <div className="mt-2 flex flex-col items-center text-xs dark:text-gray-300">
                   <p className='text-sm'>{member.email}</p>
                   {isCreator && member._id !== userData._id && (
                     <Button 

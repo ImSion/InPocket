@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';  // Importa React e gli hooks necessari
+import React, { useState, useEffect, useRef, useCallback } from 'react';  // Importa React e gli hooks necessari
 import { useAuth0 } from "@auth0/auth0-react";  // Importa hook per Auth0
 import { Button, Card, Modal, Dropdown } from 'flowbite-react';  // Importa componenti UI da Flowbite
 import { LineChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell} from 'recharts';  // Importa componenti per i grafici
@@ -24,6 +24,8 @@ export default function Home({ userData: propUserData }) {
   const [isButtonExpanded, setIsButtonExpanded] = useState(false); // Stato per l'apertura del button per l'aggiunta transazioni
   const buttonRef = useRef(null);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
 
   //Effetto per l'espansione del button aggiungi transazione
@@ -52,25 +54,6 @@ export default function Home({ userData: propUserData }) {
     };
   }, [hasAnimated]);
 
-  // Effetto per aggiornare userData quando propUserData cambia
-  useEffect(() => {
-    setUserData(propUserData);
-  }, [propUserData]);
-
-  // Effetto per recuperare i dati dell'utente quando l'autenticazione cambia
-  useEffect(() => {
-    if (isAuthenticated && user && !userData) {
-      fetchUserData();
-    }
-  }, [isAuthenticated, user, userData]);
-
-  // Effetto per recuperare le transazioni quando i dati dell'utente sono disponibili
-  useEffect(() => {
-    if (userData) {
-      fetchTransactions();
-    }
-  }, [userData]);
-
   // Funzione per recuperare i dati dell'utente dal backend
   const fetchUserData = async () => {
     try {
@@ -92,33 +75,21 @@ export default function Home({ userData: propUserData }) {
       console.error('Errore nel recupero dei dati utente:', error);
     }
   };
-
-  // Funzione per recuperare le transazioni dell'utente dal backend
-  const fetchTransactions = async () => {
-    try {
-      const response = await getUserTransactions(userData._id);
-      const allTransactions = [...response.data, ...generateRecurringTransactions(response.data)];
-      setTransactions(allTransactions);
-    } catch (error) {
-      console.error('Errore nel recupero delle transazioni:', error);
-    }
-  };
-
-  // Funzione per generare le transazioni ricorrenti
-  const generateRecurringTransactions = (transactionsData) => {
-    const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   
+  // Funzione per generare le transazioni ricorrenti
+  const generateRecurringTransactions = useCallback((transactionsData) => {
+    const today = new Date();
+    
     return transactionsData.filter(t => t.ricorrenza).flatMap(t => {
       const generatedTransactions = [];
       let currentDate = new Date(t.data);
+      const originalMonth = currentDate.getMonth();
+      const originalYear = currentDate.getFullYear();
   
-      // Controlla se la transazione originale è già nel mese corrente
-      const isInCurrentMonth = currentDate >= startOfMonth && currentDate <= endOfMonth;
-  
-      while (currentDate <= endOfMonth) {
-        if (currentDate >= startOfMonth && (!isInCurrentMonth || currentDate > today)) {
+      while (currentDate <= today) {
+        // Genera una nuova transazione solo se siamo in un mese diverso dall'originale
+        // o se siamo nello stesso mese ma in un anno successivo
+        if (currentDate.getMonth() !== originalMonth || currentDate.getFullYear() > originalYear) {
           generatedTransactions.push({
             ...t,
             data: new Date(currentDate),
@@ -126,7 +97,7 @@ export default function Home({ userData: propUserData }) {
           });
         }
   
-        // Aggiorna la data per la prossima iterazione
+        // Avanza alla prossima data
         switch (t.frequenzaRicorrenza) {
           case 'Giornaliera':
             currentDate.setDate(currentDate.getDate() + 1);
@@ -145,7 +116,42 @@ export default function Home({ userData: propUserData }) {
   
       return generatedTransactions;
     });
-  };
+  }, []);
+
+  // Funzione per recuperare le transazioni dell'utente dal backend
+  const fetchTransactions = useCallback(async () => {
+    if (!userData?._id) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getUserTransactions(userData._id);
+      const allTransactions = [
+        ...response.data,
+        ...generateRecurringTransactions(response.data)
+      ];
+      setTransactions(allTransactions);
+    } catch (error) {
+      console.error('Errore nel recupero delle transazioni:', error);
+      setError('Impossibile recuperare le transazioni. Riprova più tardi.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userData, generateRecurringTransactions]);
+
+  // Effetto per recuperare i dati dell'utente quando l'autenticazione cambia
+  useEffect(() => {
+    if (isAuthenticated && user && !userData) {
+      fetchUserData();
+    }
+  }, [isAuthenticated, user, userData]);
+
+  // Effetto per recuperare le transazioni quando i dati dell'utente sono disponibili
+  useEffect(() => {
+    if (userData) {
+      fetchTransactions();
+    }
+  }, [userData, fetchTransactions]);
+
 
   // Componente per la legenda personalizzata del grafico a torta
   const CustomPieLegend = ({ data, title }) => (
@@ -473,6 +479,8 @@ export default function Home({ userData: propUserData }) {
   // Rendering del componente
   return (
     <div className='xl:flex xl:flex-col xl:items-center'>
+      {isLoading && <p>Caricamento dati in corso...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {/* Header con benvenuto e titolo dashboard */}
       <div className='flex justify-between xl:w-[1200px]'>
         <h1 className="text-lg xs:text-xl sm:text-2xl font-bold mb-4 dark:text-white dark:shadow-lg textshdw shake" translate='no'>
