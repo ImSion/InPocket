@@ -141,7 +141,7 @@ export default function UserProfile({ userData, updateUserData }) {
             <div className='flex flex-col justify-center items-center gap-2 dark:text-white'>
               <div className='flex flex-col lg:flex-row gap-1 items-center justify-center '>
 
-                <img src={formData.avatar} alt="Avatar" className='w-[99%] h-[300px] sm:max-h-[350px] sm:max-w-[600px] rounded-lg' />
+                <img src={formData.avatar} alt="Avatar" className='w-[99%] h-[300px] sm:max-h-[350px] sm:max-w-[600px] rounded-lg object-cover object-center' />
   
                 <div className='flex flex-col mt-2'>
                   
