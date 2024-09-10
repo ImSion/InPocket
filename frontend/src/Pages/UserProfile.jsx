@@ -148,7 +148,7 @@ export default function UserProfile({ userData, updateUserData }) {
                   <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top border mb-2 p-3'>Nome: {formData.nome}</p>
                   <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-1 border mb-2 p-3'>Cognome: {formData.cognome}</p>
     
-                  <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-2 border mb-2 p-3'>Email: {formData.email}</p>
+                  <p className='text-lg lg:w-[350px] shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-2 border mb-2 p-3'>Email: {formData.email}</p>
                   <p className='text-lg shadow-[inset_0px_0px_10px] font-sans border-black rounded-lg fade-in-top delay-3 border mb-2 p-3'>Data di nascita: {formData.data_di_nascita}</p>
   
                 </div>
