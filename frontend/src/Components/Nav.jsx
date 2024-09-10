@@ -23,9 +23,7 @@ export default function Nav({ userData }) {
   const { hasNewInvite, checkInvites } = useContext(NotificationContext);
 
   useEffect(() => {
-    console.log('Componente Nav montato');
     if (isAuthenticated && user) {
-      console.log('Utente autenticato, avvio polling');
       checkInvites();
       const interval = setInterval(checkInvites, 60000); // Ogni minuto
       return () => clearInterval(interval);

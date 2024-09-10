@@ -29,20 +29,20 @@ export const NotificationProvider = ({ children }) => {
 
   const checkInvites = useCallback(async () => {
     if (!isAuthenticated || !user) {
-      console.log('Utente non autenticato o dati mancanti');
+      // console.log('Utente non autenticato o dati mancanti');
       return;
     }
   
     try {
-      console.log('Inizio controllo inviti per:', user.sub);
+      // console.log('Inizio controllo inviti per:', user.sub);
       const token = await getAccessTokenSilently();
-      console.log('Token ottenuto');
+      // console.log('Token ottenuto');
       
       const response = await axiosApi.get(`${API_URL}/users/check-invites?userId=${user.sub}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      console.log('Risposta ricevuta:', response.data);
+      // console.log('Risposta ricevuta:', response.data);
   
       if (Array.isArray(response.data.invites)) {
         response.data.invites.forEach(invite => {
