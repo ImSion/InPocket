@@ -69,7 +69,7 @@ export const NotificationProvider = ({ children }) => {
 
   const showAlert = useCallback((message, type = 'success') => {
     setAlert({ message, type });
-    setTimeout(() => setAlert(null), 2000);
+    setTimeout(() => setAlert(null), 3000);
   }, []);
 
   useEffect(() => {
@@ -90,8 +90,8 @@ export const NotificationProvider = ({ children }) => {
     }}>
       {children}
       {alert && (
-        <div className={`fixed top-4 right-4 p-4 rounded-md text-white ${
-          alert.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        <div className={`fixed top-4 right-4 p-3 rounded-md text-white ${
+          alert.type === 'success' ? 'bg-green-500 animate-bounce' : 'bg-red-500'
         }`}>
           {alert.message}
         </div>
