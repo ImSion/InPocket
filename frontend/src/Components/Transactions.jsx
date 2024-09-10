@@ -26,7 +26,7 @@ const FREQUENZE_RICORRENZA = [
 
 export default function Transactions({ show, onClose, onSubmit, transaction: initialTransaction }) {
   // Stato per gestire i dati della transazione
-  const [transaction, setTransaction] = useState({
+  const initialState = {
     tipo: 'uscita',
     categoria: '',
     importo: '',
@@ -34,24 +34,18 @@ export default function Transactions({ show, onClose, onSubmit, transaction: ini
     data: new Date().toISOString().split('T')[0],
     ricorrenza: false,
     frequenzaRicorrenza: 'Mensile'
-  });
+  };
+
+  const [transaction, setTransaction] = useState(initialState);
 
   // Effetto per inizializzare o resettare il form quando cambia la transazione iniziale
   useEffect(() => {
     if (initialTransaction) {
       setTransaction(initialTransaction);
     } else {
-      setTransaction({
-        tipo: 'uscita',
-        categoria: '',
-        importo: '',
-        descrizione: '',
-        data: new Date().toISOString().split('T')[0],
-        ricorrenza: false,
-        frequenzaRicorrenza: 'Mensile'
-      });
+      setTransaction(initialState);
     }
-  }, [initialTransaction]);
+  }, [initialTransaction, show]);  // Aggiungiamo 'show' come dipendenza
 
   // Gestore per i cambiamenti nei campi del form
   const handleChange = (e) => {
@@ -67,6 +61,8 @@ export default function Transactions({ show, onClose, onSubmit, transaction: ini
       return;
     }
     onSubmit(transaction);
+    // Resettiamo il form allo stato iniziale dopo la sottomissione
+    setTransaction(initialState);
   };
 
   return (

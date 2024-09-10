@@ -474,6 +474,8 @@ export default function Home({ userData: propUserData }) {
     }
   };
 
+  const sortedTransactions = [...transactions].sort((a, b) => new Date(b.data) - new Date(a.data));
+
   // Rendering del componente
   return (
     <div className='xl:flex xl:flex-col xl:items-center'>
@@ -583,7 +585,7 @@ export default function Home({ userData: propUserData }) {
         <div className="sm:flex sm:gap-4 border-t-2 border-black dark:border-cyan-500">
           {/* Lista delle prime 10 transazioni */}
           <ul className="w-full sm:w-1/2 mt-3">
-          {transactions.slice(0, 10).map((transaction) => (
+          {sortedTransactions.slice(0, 10).map((transaction) => (
             <li 
               key={transaction._id} 
               className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-all ease-in-out duration-500 ${
@@ -634,7 +636,7 @@ export default function Home({ userData: propUserData }) {
           </ul>
           {/* Lista delle successive 10 transazioni (visibile solo su schermi più grandi) */}
           <ul className="w-full sm:w-1/2 hidden sm:block mt-3">
-            {transactions.slice(10, 20).map((transaction) => (
+            {sortedTransactions.slice(10, 20).map((transaction) => (
               <li 
                 key={transaction._id} 
                 className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-all ease-in-out duration-500 ${

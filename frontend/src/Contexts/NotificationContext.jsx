@@ -69,7 +69,7 @@ export const NotificationProvider = ({ children }) => {
 
   const showAlert = useCallback((message, type = 'success') => {
     setAlert({ message, type });
-    setTimeout(() => setAlert(null), 3000);
+    setTimeout(() => setAlert(null), 4000);
   }, []);
 
   useEffect(() => {
