@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
+import axiosApi from '../Modules/Axios.js'; 
 
 export const NotificationContext = createContext();
 
@@ -8,6 +9,8 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [alert, setAlert] = useState(null);
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
+
+  const API_URL = 'https://inpocket.onrender.com/api' || 'http://localhost:5001/api';
 
   const addNotification = useCallback((newNotification) => {
     setNotifications(prev => {
@@ -25,16 +28,25 @@ export const NotificationProvider = ({ children }) => {
   }, []);
 
   const checkInvites = useCallback(async () => {
-    if (!isAuthenticated || !user) return;
-
+    if (!isAuthenticated || !user) {
+      console.log('Utente non autenticato o dati mancanti');
+      return;
+    }
+  
     try {
+      console.log('Inizio controllo inviti per:', user.sub);
       const token = await getAccessTokenSilently();
-      const response = await axios.get(`/api/users/check-invites?userId=${user.sub}`, {
+      console.log('Token ottenuto');
+      
+      const response = await axiosApi.get(`${API_URL}/users/check-invites?userId=${user.sub}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      console.log('Risposta ricevuta:', response.data);
+  
       if (Array.isArray(response.data.invites)) {
         response.data.invites.forEach(invite => {
+          console.log('Aggiunta notifica per invito:', invite);
           addNotification({
             type: 'invite',
             message: `Hai un nuovo invito al gruppo "${invite.groupName || 'Sconosciuto'}"!`,
@@ -42,6 +54,7 @@ export const NotificationProvider = ({ children }) => {
           });
         });
       } else if (response.data.hasNewInvite) {
+        console.log('Aggiunta notifica generica per nuovo invito');
         addNotification({
           type: 'invite',
           message: 'Hai un nuovo invito a un gruppo!',
@@ -50,6 +63,7 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Errore nel controllo degli inviti:', error);
+      console.error('Dettagli errore:', error.response?.data);
     }
   }, [isAuthenticated, user, getAccessTokenSilently, addNotification]);
 

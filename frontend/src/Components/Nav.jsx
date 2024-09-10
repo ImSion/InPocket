@@ -23,8 +23,14 @@ export default function Nav({ userData }) {
   const { hasNewInvite, checkInvites } = useContext(NotificationContext);
 
   useEffect(() => {
-    checkInvites();
-  }, [checkInvites]);
+    console.log('Componente Nav montato');
+    if (isAuthenticated && user) {
+      console.log('Utente autenticato, avvio polling');
+      checkInvites();
+      const interval = setInterval(checkInvites, 60000); // Ogni minuto
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user, checkInvites]);
 
   const profileImage = userData?.avatar || user?.picture;
 

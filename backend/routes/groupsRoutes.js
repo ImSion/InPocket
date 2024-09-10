@@ -125,21 +125,21 @@ router.delete('/:id', async (req, res) => {
 
 // Invita un utente al gruppo
 router.post('/:id/invite', async (req, res) => {
+  console.log('Richiesta di invito ricevuta:', req.params, req.body);
   try {
     const group = await Group.findById(req.params.id);
     if (!group) {
+      console.log('Gruppo non trovato:', req.params.id);
       return res.status(404).json({ message: 'Gruppo non trovato' });
     }
     
     const invitedUser = await Users.findOne({ email: req.body.email });
     if (!invitedUser) {
+      console.log('Utente invitato non trovato:', req.body.email);
       return res.status(404).json({ message: 'Utente non trovato' });
     }
 
-    if (group.members.includes(invitedUser._id)) {
-      return res.status(400).json({ message: 'Utente già membro del gruppo' });
-    }
-
+    console.log('Aggiunta invito per utente:', invitedUser._id);
     await Users.findByIdAndUpdate(invitedUser._id, {
       $addToSet: {
         groupInvites: {
@@ -149,10 +149,11 @@ router.post('/:id/invite', async (req, res) => {
       }
     });
 
+    console.log('Invito aggiunto con successo');
     res.json({ message: 'Invito inviato con successo' });
   } catch (error) {
     console.error('Errore nell\'invio dell\'invito:', error);
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

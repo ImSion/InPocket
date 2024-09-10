@@ -587,7 +587,7 @@ export default function Home({ userData: propUserData }) {
             <li 
               key={transaction._id} 
               className={`flex justify-between items-center mb-3 dark:text-white px-2 cursor-pointer transition-all ease-in-out duration-500 ${
-                selectedTransactionId === transaction._id ? 'bg-slate-600 dark:bg-sky-600 h-10 rounded-lg px-5' : ''
+                selectedTransactionId === transaction._id ? 'bg-slate-600 dark:bg-sky-600 h-10 rounded-lg px-5 text-white dark:text-black' : ''
               }`}
               onClick={() => setSelectedTransactionId(
                 selectedTransactionId === transaction._id ? null : transaction._id
