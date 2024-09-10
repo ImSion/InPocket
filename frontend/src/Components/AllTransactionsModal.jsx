@@ -40,9 +40,19 @@ export default function AllTransactionsModal({ show, onClose, transactions }) {
       <Modal.Header className='dark:bg-sky-950'>Tutte le Transazioni</Modal.Header>
       <Modal.Body className='dark:bg-sky-950'>
         <div className="flex justify-between mb-4">
-          <Button onClick={() => navigateMonth(-1)}>Indietro</Button>
-          <h2 className='dark:text-white text-xl items-center justify-center flex'>{currentMonth.format('MMMM YYYY')}</h2>
-          <Button onClick={() => navigateMonth(1)}>Avanti</Button>
+          {/* Button indietro */}
+          <Button className='rounded-full' onClick={() => navigateMonth(-1)}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+          </Button>
+          <h2 className='dark:text-white text-sm sm:text-xl items-center justify-center flex'>{currentMonth.format('MMMM YYYY')}</h2>
+          {/* button avanti */}
+          <Button className='rounded-full' onClick={() => navigateMonth(1)}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+          </Button>
         </div>
         <ul className="mb-4 dark:text-white ">
           {currentTransactions.map((transaction, index) => (
@@ -53,7 +63,7 @@ export default function AllTransactionsModal({ show, onClose, transactions }) {
                   {transaction.tipo === 'entrata' ? '+' : '-'}€{transaction.importo.toFixed(2)}
                 </span>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-400">
                 {moment(transaction.data).format('DD/MM/YYYY')} - {transaction.categoria}
               </div>
             </li>

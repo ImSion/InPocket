@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';  // Importa React e hooks necessari
-import { getGroups, createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';  // Importa funzioni API
+import { createGroup, getUserGroupsAndInvites, acceptGroupInvite, rejectGroupInvite, deleteGroup } from '../Modules/ApiCrud';  // Importa funzioni API
 import GroupList from '../Components/GroupsComponents/GroupList';  // Importa componente per la lista dei gruppi
 import GroupDetail from '../Components/GroupsComponents/GroupDetail';  // Importa componente per i dettagli del gruppo
 import CreateGroupForm from '../Components/GroupsComponents/CreateGroup';  // Importa componente per creare un nuovo gruppo
 import InvitesList from '../Components/GroupsComponents/InvitesList';  // Importa componente per la lista degli inviti
-import { NotificationContext, NotificationProvider } from '../Contexts/NotificationContext';  // Importa contesto per le notifiche
+import { NotificationContext } from '../Contexts/NotificationContext';  // Importa contesto per le notifiche
 
 export default function Groups({ userData }) {
   // Stati per gestire gruppi, inviti, gruppo selezionato e form di creazione
@@ -80,7 +80,7 @@ export default function Groups({ userData }) {
 
   // Rendering del componente
   return (
-    <div className="  p-4 min-h-screen flex flex-col items-center justify-center">
+    <div className="p-4 min-h-screen flex flex-col items-center justify-center">
       <div className='flex flex-col items-center justify-center'>
         <h1 className="text-2xl font-bold mb-8 text-center dark:text-white">I tuoi Gruppi</h1>
         {/* Pulsante per creare un nuovo gruppo */}

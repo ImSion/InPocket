@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';                  // Importa React e gli hooks necessari
+import React, { useState, useEffect, useRef, useCallback } from 'react';  // Importa React e gli hooks necessari
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';  // Importa il componente Calendar e il localizzatore
 import moment from 'moment';                                                    // Importa moment.js per la gestione delle date
 import 'moment/locale/it';                                                      // Importa la localizzazione italiana di moment
@@ -25,29 +25,35 @@ const messages = {    // Definisce le traduzioni italiane per il calendario
   showMore: total => `+ Vedi altri (${total})`
 };
 
-const mesiItaliani = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', // Array con i nomi dei mesi in italiano
-                      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-const giorniItaliani = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì',   // Array con i nomi dei giorni in italiano
-                        'Giovedì', 'Venerdì', 'Sabato'];
+const mesiItaliani = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+  'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+const giorniItaliani = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì',
+    'Giovedì', 'Venerdì', 'Sabato'];
 
-export default function Calendar({ tasks, onSelectDate }) {  // Definizione del componente Calendar
-  const calendarRef = useRef(null);    // Crea un riferimento per l'elemento DOM del calendario
-
-  const tasksByDate = tasks.reduce((acc, task) => {   // Raggruppa le task per data
-    const date = moment(task.scheduledDate).format('YYYY-MM-DD');
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].push(task);
-    return acc;
-  }, {});
-
-  const events = Object.entries(tasksByDate).map(([date, tasksForDate]) => ({    // Crea gli eventi per il calendario
-    title: `${tasksForDate.length} task${tasksForDate.length > 1 ? 's' : ''}`,
-    start: new Date(date),
-    end: new Date(date),
-    allDay: true,
-  }));
+    export default function Calendar({ tasks, onSelectDate }) {
+      const calendarRef = useRef(null);
+      const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+      const [events, setEvents] = useState([]);
+    
+      useEffect(() => {
+        const tasksByDate = tasks.reduce((acc, task) => {
+          const date = moment(task.scheduledDate).format('YYYY-MM-DD');
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(task);
+          return acc;
+        }, {});
+    
+        const newEvents = Object.entries(tasksByDate).map(([date, tasksForDate]) => ({
+          title: `${tasksForDate.length} task${tasksForDate.length > 1 ? 's' : ''}`,
+          start: new Date(date),
+          end: new Date(date),
+          allDay: true,
+        }));
+    
+        setEvents(newEvents);
+      }, [tasks]);
 
   const formats = {  // Definisce i formati personalizzati per il calendario
     monthHeaderFormat: (date) => `${mesiItaliani[date.getMonth()]} ${date.getFullYear()}`,
@@ -58,59 +64,86 @@ export default function Calendar({ tasks, onSelectDate }) {  // Definizione del 
     weekdayFormat: (date) => giorniItaliani[date.getDay()],
   };
 
-  const handleSelectSlot = useCallback(({ start }) => {     // Gestisce la selezione di uno slot nel calendario
-    console.log('Slot selezionato:', start);
+  const handleSelectSlot = useCallback(({ start }) => {
+    //console.log('Slot selezionato:', start);
     onSelectDate(start);
   }, [onSelectDate]);
 
-  const handleSelectEvent = useCallback((event) => {  // Gestisce la selezione di un evento nel calendario
+  const handleSelectEvent = useCallback((event) => {
     console.log('Evento selezionato:', event.start);
     onSelectDate(event.start);
   }, [onSelectDate]);
-// Effetto per gestire gli eventi touch su mobile
-useEffect(() => {                               
-  const calendar = calendarRef.current;  // Ottiene il riferimento all'elemento DOM del calendario
 
-  if (calendar) {                                // Verifica se il riferimento al calendario esiste
-    const touchStartHandler = (e) => {           // Definisce una funzione per gestire l'evento touchstart
-      if (e.touches.length === 1) {              // Verifica se c'è esattamente un punto di contatto
-        e.preventDefault();                      // Previene il comportamento predefinito del touch
-        const touch = e.touches[0];              // Ottiene il primo (e unico) punto di contatto
-        const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);  // Trova l'elemento DOM nella posizione del touch
-        if (targetElement) {                     // Se un elemento è stato trovato nella posizione del touch
-          targetElement.click();                 // Simula un click su quell'elemento
+  useEffect(() => {
+    const calendar = calendarRef.current;
+
+    if (calendar) {
+      const touchStartHandler = (e) => {
+        if (e.touches.length === 1) {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (targetElement) {
+            targetElement.click();
+          }
         }
-      }
-    };
+      };
 
-    calendar.addEventListener('touchstart', touchStartHandler, { passive: false });  // Aggiunge l'event listener al calendario
+      calendar.addEventListener('touchstart', touchStartHandler, { passive: false });
 
-    return () => {                               // Funzione di cleanup
-      calendar.removeEventListener('touchstart', touchStartHandler);  // Rimuove l'event listener quando il componente si smonta
-    };
-  }
-}, []);  // Array di dipendenze vuoto, l'effetto si esegue solo al mount
+      return () => {
+        calendar.removeEventListener('touchstart', touchStartHandler);
+      };
+    }
+  }, []);
 
-
+  const toggleCalendar = () => {
+    setIsCalendarOpen(!isCalendarOpen);
+  };
 
   return (
-    // Renderizza il contenitore del calendario
-    <div className='h-[500px] w-[336px] xs:w-[370px] sm:w-full' ref={calendarRef}>                                        
-      <BigCalendar                                 // Renderizza il componente BigCalendar
-        localizer={localizer}                      // Passa il localizzatore
-        events={events}                            // Passa gli eventi
-        startAccessor="start"                      // Specifica la proprietà di inizio evento
-        endAccessor="end"                          // Specifica la proprietà di fine evento
-        onSelectSlot={handleSelectSlot}            // Gestisce la selezione di uno slot
-        onSelectEvent={handleSelectEvent}          // Gestisce la selezione di un evento
-        selectable={true}                          // Permette la selezione di slot
-        longPressThreshold={10}                    // Imposta la soglia per il press lungo
-        views={['month']}
-        messages={messages}                        // Passa le traduzioni
-        formats={formats}                          // Passa i formati personalizzati
-        culture='it'                               // Imposta la cultura (lingua)
-        className='dark:text-white custom-calendar'              // Applica stili per il tema scuro
-      />
+    <div className="flex flex-col items-center w-[340px] sm:w-full">
+    <button 
+      onClick={toggleCalendar}
+      className="w-[260px] sm:w-[340px] mb-2 p-1 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-all duration-300 ease-in-out"
+    >
+      {isCalendarOpen ? 'Chiudi Calendario' : 'Apri Calendario'}
+    </button>
+    
+    <div 
+      className={`w-[340px] sm:w-full overflow-hidden transition-all duration-500 ease-in-out ${
+        isCalendarOpen ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
+      }`}
+    >
+      <div className='h-[500px] w-[340px] sm:w-full mt-2' ref={calendarRef}>                                        
+        <BigCalendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          selectable={true}
+          longPressThreshold={10}
+          views={['month']}
+          messages={messages}
+          formats={formats}
+          culture='it'
+          className='dark:text-white custom-calendar w-full h-full'
+        />
+      </div>
     </div>
-  );
-}
+    
+    {isCalendarOpen && (
+      <button 
+        onClick={toggleCalendar}
+        className="w-[260px] flex items-center justify-center sm:w-[340px] mt-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-all duration-300 ease-in-out"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+        </svg>
+
+      </button>
+    )}
+  </div>
+)}

@@ -15,6 +15,8 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMember, setSelectedMember] = useState(null);
   const { addNotification, showAlert  } = useContext(NotificationContext);
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState(false);
+  const [userToRemove, setUserToRemove] = useState(null);
 
   useEffect(() => {
     // console.log('Gruppo ricevuto:', initialGroup);
@@ -85,26 +87,29 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
     }
   };
 
-  const handleRemoveUser = async (userIdToRemove) => {
-    if (window.confirm('Sei sicuro di voler rimuovere questo utente dal gruppo?')) {
-      try {
-        console.log('Rimozione utente:', userIdToRemove);
-        console.log('ID del gruppo:', group._id);
-        console.log('ID del creatore:', userData._id);
-        const response = await removeUserFromGroup(group._id, userData._id, userIdToRemove);
-        console.log('Risposta dal server:', response.data);
-        
-        setGroup(prevGroup => ({
-          ...prevGroup,
-          members: prevGroup.members.filter(member => member._id !== userIdToRemove)
-        }));
-        
-        await refreshGroupData();
-        
-        onUpdate();
-      } catch (error) {
-        console.error('Errore nella rimozione dell\'utente dal gruppo:', error.response?.data || error.message);
-      }
+  const handleRemoveUser = (userIdToRemove) => {
+    setUserToRemove(userIdToRemove);
+    setShowRemoveUserModal(true);
+  };
+
+  const confirmRemoveUser = async () => {
+    try {
+      console.log('Rimozione utente:', userToRemove);
+      console.log('ID del gruppo:', group._id);
+      console.log('ID del creatore:', userData._id);
+      const response = await removeUserFromGroup(group._id, userData._id, userToRemove);
+      console.log('Risposta dal server:', response.data);
+      
+      setGroup(prevGroup => ({
+        ...prevGroup,
+        members: prevGroup.members.filter(member => member._id !== userToRemove)
+      }));
+      
+      await refreshGroupData();
+      onUpdate();
+      setShowRemoveUserModal(false);
+    } catch (error) {
+      console.error('Errore nella rimozione dell\'utente dal gruppo:', error.response?.data || error.message);
     }
   };
 
@@ -165,7 +170,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
   }; 
 
   return (
-    <div className="w-full">
+    <div className="w-[340px] xs:w-[370px] sm:w-[700px] lg:w-[900px] mt-10">
       <h2 className="text-xl dark:text-white font-semibold mb-2">Gruppo: {group.name}</h2>
       <p className="dark:text-gray-300 mb-4">{group.description}</p>
 
@@ -179,7 +184,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
               src={member.avatar || member.picture || (member.user && member.user.avatar) || "https://via.placeholder.com/150"}
               alt={`${member.nome || member.name || (member.user && member.user.nome) || 'User'} ${member.cognome || member.surname || (member.user && member.user.cognome) || ''}`}
               onClick={() => handleMemberClick(member)}
-              className="w-16 h-16 sm:w-20 sm:h-20 hover:scale-105 transition-all ease-in-out duration-500 rounded-lg shadow-[0px_0px_10px] mb-1 sm:rounded-full object-cover cursor-pointer"
+              className="w-10 h-10 sm:w-16 sm:h-16 hover:scale-105 transition-all ease-in-out duration-500 rounded-lg shadow-[0px_0px_10px] mb-1 sm:rounded-full object-cover cursor-pointer"
               onError={(e) => {
                 console.error("Errore nel caricamento dell'avatar:", e);
                 e.target.onerror = null;
@@ -189,12 +194,12 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
             <div className="flex flex-col items-center">
               <button 
                 onClick={() => handleMemberClick(member)}
-                className="text-lg ml-4 mt-4 sm:mt-1 sm:ml-0 text-center dark:text-white transition-all ease-in-out duration-500 hover:scale-105"
+                className="text-lg ml-4 mt-2 sm:mt-1 sm:ml-0 text-center dark:text-white transition-all ease-in-out duration-500 hover:scale-105"
               >
                 {member.nome} {member.cognome}
               </button>
               {selectedMember === member && (
-                <div className="mt-2 flex flex-col items-center text-xs dark:text-gray-300">
+                <div className="mt-1 flex flex-col items-center text-xs dark:text-gray-300">
                   <p className='text-sm'>{member.email}</p>
                   {isCreator && member._id !== userData._id && (
                     <Button 
@@ -244,7 +249,7 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
         <Calendar 
           tasks={group.tasks} 
           onSelectDate={(date) => {
-            console.log('Data selezionata in Calendar:', date);
+            //console.log('Data selezionata in Calendar:', date);
             setSelectedDate(date);
           }}
         />
@@ -261,17 +266,36 @@ export default function GroupDetail({ group: initialGroup, onUpdate, onDelete, u
           />
         </div>
       </div>
+
+      <Modal show={showRemoveUserModal} onClose={() => setShowRemoveUserModal(false)}>
+        <Modal.Header className='dark:bg-sky-950'>Conferma rimozione utente</Modal.Header>
+        <Modal.Body className='dark:bg-sky-950'>
+          <div className="space-y-6">
+            <p className="text-base leading-relaxed text-gray-500 dark:text-white">
+              Sei sicuro di voler rimuovere questo utente dal gruppo?
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className='dark:bg-sky-950'>
+          <Button color="failure" onClick={confirmRemoveUser}>
+            Sì, rimuovi
+          </Button>
+          <Button color="gray" onClick={() => setShowRemoveUserModal(false)}>
+            Annulla
+          </Button>
+        </Modal.Footer>
+      </Modal>
       
       <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
-        <Modal.Header>Conferma eliminazione</Modal.Header>
-        <Modal.Body>
+        <Modal.Header className='dark:bg-sky-950'>Conferma eliminazione</Modal.Header>
+        <Modal.Body className='dark:bg-sky-950'>
           <div className="space-y-6">
-            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+            <p className="text-base leading-relaxed text-gray-500 dark:text-white">
               Sei sicuro di voler eliminare questo gruppo? Questa azione non può essere annullata.
             </p>
           </div>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className='dark:bg-sky-950'>
           <Button color="failure" onClick={handleDeleteGroup}>
             Sì, elimina
           </Button>

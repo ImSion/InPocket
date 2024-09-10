@@ -141,7 +141,7 @@ export default function UserProfile({ userData, updateUserData }) {
             <div className='flex flex-col justify-center items-center gap-2 dark:text-white'>
               <div className='flex flex-col lg:flex-row gap-1 items-center justify-center '>
 
-                <img src={formData.avatar} alt="Avatar" className='w-[99%] h-full sm:max-w-[600px] rounded-lg' />
+                <img src={formData.avatar} alt="Avatar" className='w-[99%] h-[300px] sm:max-h-[350px] sm:max-w-[600px] rounded-lg' />
   
                 <div className='flex flex-col mt-2'>
                   
@@ -154,7 +154,7 @@ export default function UserProfile({ userData, updateUserData }) {
                 </div>
 
               </div>
-                <button className='border border-sky-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-sky-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-sky-500 transition-all ease-in-out duration-500' onClick={() => setEditMode(true)}>Modifica profilo</button>
+                <button className='border border-sky-500 p-3 mt-3 rounded-lg shadow-[inset_0px_0px_10px] shadow-sky-500 hover:shadow-[inset_0px_0px_16px] hover:shadow-sky-500 transition-all ease-in-out duration-500 hover:scale-105' onClick={() => setEditMode(true)}>Modifica profilo</button>
 
 
             </div>
