@@ -126,35 +126,33 @@ router.delete('/:id', async (req, res) => {
 // Invita un utente al gruppo
 router.post('/:id/invite', async (req, res) => {
   try {
-    const group = await Group.findById(req.params.id);  // Trova il gruppo
+    const group = await Group.findById(req.params.id);
     if (!group) {
-      return res.status(404).json({ message: 'Gruppo non trovato' });  // Se il gruppo non esiste
+      return res.status(404).json({ message: 'Gruppo non trovato' });
     }
     
-    const invitedUser = await Users.findOne({ email: req.body.email });  // Trova l'utente da invitare
+    const invitedUser = await Users.findOne({ email: req.body.email });
     if (!invitedUser) {
-      return res.status(404).json({ message: 'Utente non trovato' });  // Se l'utente non esiste
+      return res.status(404).json({ message: 'Utente non trovato' });
     }
 
-    // Verifica se l'utente è già membro del gruppo
     if (group.members.includes(invitedUser._id)) {
       return res.status(400).json({ message: 'Utente già membro del gruppo' });
     }
 
-    // Aggiunge l'invito all'utente
     await Users.findByIdAndUpdate(invitedUser._id, {
-      $addToSet: {  // Usa $addToSet per evitare duplicati
+      $addToSet: {
         groupInvites: {
           group: group._id,
-          invitedBy: req.body.inviterId  // ID dell'utente che sta invitando
+          invitedBy: req.body.inviterId
         }
       }
     });
 
-    res.json({ message: 'Invito inviato con successo' });  // Risponde con un messaggio di successo
+    res.json({ message: 'Invito inviato con successo' });
   } catch (error) {
-    console.error('Errore nell\'invio dell\'invito:', error);  // Log dell'errore
-    res.status(400).json({ message: error.message });  // Risponde con l'errore
+    console.error('Errore nell\'invio dell\'invito:', error);
+    res.status(400).json({ message: error.message });
   }
 });
 

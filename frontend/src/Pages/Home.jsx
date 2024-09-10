@@ -83,13 +83,11 @@ export default function Home({ userData: propUserData }) {
     return transactionsData.filter(t => t.ricorrenza).flatMap(t => {
       const generatedTransactions = [];
       let currentDate = new Date(t.data);
-      const originalMonth = currentDate.getMonth();
-      const originalYear = currentDate.getFullYear();
   
       while (currentDate <= today) {
-        // Genera una nuova transazione solo se siamo in un mese diverso dall'originale
-        // o se siamo nello stesso mese ma in un anno successivo
-        if (currentDate.getMonth() !== originalMonth || currentDate.getFullYear() > originalYear) {
+        // Genera una nuova transazione se la data corrente è diversa dalla data originale
+        // e non è nel futuro rispetto a oggi
+        if (currentDate > new Date(t.data) && currentDate <= today) {
           generatedTransactions.push({
             ...t,
             data: new Date(currentDate),
@@ -97,7 +95,7 @@ export default function Home({ userData: propUserData }) {
           });
         }
   
-        // Avanza alla prossima data
+        // Avanza alla prossima data secondo la frequenza
         switch (t.frequenzaRicorrenza) {
           case 'Giornaliera':
             currentDate.setDate(currentDate.getDate() + 1);

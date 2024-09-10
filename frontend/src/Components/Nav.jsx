@@ -44,10 +44,10 @@ export default function Nav({ userData }) {
               arrowIcon={false}
               inline
               label={
-                <Avatar 
+                <img
+                  src={profileImage} 
                   alt="User settings" 
-                  img={profileImage}
-                  className="dark:shadow-[0px_0px_10px] dark:shadow-sky-600 dark:hover:shadow-[0px_0px_20px] hover:dark:shadow-sky-600 transition-all ease-in-out duration-500" 
+                  className="dark:shadow-[0px_0px_10px] ml-1 w-10 h-10 rounded-lg object-cover object-center dark:shadow-sky-600 dark:hover:shadow-[0px_0px_20px] hover:dark:shadow-sky-600 transition-all ease-in-out duration-500" 
                 />
               }
               >
